@@ -1,0 +1,2805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>HBILLSOFT - Billing Software</title>
+    <style>
+/* ===== CSS VARIABLES ===== */
+:root {
+    --bg-primary: #0f0f1a;
+    --bg-secondary: #1a1a2e;
+    --bg-tertiary: #16213e;
+    --bg-card: rgba(255, 255, 255, 0.05);
+    --bg-hover: rgba(255, 255, 255, 0.08);
+    --text-primary: #ffffff;
+    --text-secondary: #a0a0b0;
+    --text-muted: #6c6c80;
+    --accent: #ff6b35;
+    --accent-hover: #ff8555;
+    --accent-light: rgba(255, 107, 53, 0.15);
+    --success: #00d4aa;
+    --danger: #ff3366;
+    --warning: #ffaa00;
+    --border: rgba(255, 255, 255, 0.08);
+    --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    --glass: rgba(255, 255, 255, 0.03);
+    --radius: 16px;
+    --radius-sm: 10px;
+    --font-size: 14px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-theme="light"] {
+    --bg-primary: #f0f2f5;
+    --bg-secondary: #ffffff;
+    --bg-tertiary: #e8ecf1;
+    --bg-card: rgba(255, 255, 255, 0.7);
+    --bg-hover: rgba(0, 0, 0, 0.04);
+    --text-primary: #1a1a2e;
+    --text-secondary: #4a4a5a;
+    --text-muted: #8a8a9a;
+    --border: rgba(0, 0, 0, 0.08);
+    --shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    --glass: rgba(255, 255, 255, 0.6);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { font-size: 14px; }
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    transition: var(--transition);
+}
+
+/* ===== LOADING SCREEN ===== */
+#loading-screen {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(135deg, #0a0a1a 0%, #0d1b3e 40%, #0a1628 70%, #060d1f 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    overflow: hidden;
+}
+
+#loading-screen::before {
+    content: '';
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(0, 180, 255, 0.08) 0%, transparent 70%);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: pulseGlow 3s ease-in-out infinite;
+}
+
+#loading-screen::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: 
+        radial-gradient(circle at 20% 20%, rgba(0,180,255,0.04) 0%, transparent 40%),
+        radial-gradient(circle at 80% 80%, rgba(0,100,255,0.04) 0%, transparent 40%);
+}
+
+@keyframes pulseGlow {
+    0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
+    50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+}
+
+#loading-screen.done {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+.loading-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    position: relative;
+    z-index: 1;
+    animation: fadeInUp 0.8s ease forwards;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.loading-logo-wrap {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.loading-logo {
+    width: 110px;
+    height: 110px;
+    border-radius: 24px;
+    object-fit: cover;
+    display: block;
+    box-shadow: 0 0 40px rgba(0, 180, 255, 0.4), 0 0 80px rgba(0, 100, 255, 0.2);
+    animation: logoFloat 3s ease-in-out infinite;
+}
+
+@keyframes logoFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+
+.loading-logo-ring {
+    position: absolute;
+    inset: -8px;
+    border-radius: 32px;
+    border: 2px solid transparent;
+    background: linear-gradient(135deg, #00b4ff, #0066ff, #00b4ff) border-box;
+    -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: destination-out;
+    mask-composite: exclude;
+    animation: ringRotate 3s linear infinite;
+}
+
+@keyframes ringRotate {
+    to { transform: rotate(360deg); }
+}
+
+.loading-appname {
+    font-family: 'Inter', sans-serif;
+    font-size: 2.8rem;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    background: linear-gradient(90deg, #00b4ff 0%, #ffffff 40%, #4d9fff 70%, #00b4ff 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 2.5s linear infinite;
+    margin-bottom: 0.2rem;
+    text-shadow: none;
+}
+
+@keyframes shimmer {
+    to { background-position: 200% center; }
+}
+
+.loading-tagline {
+    font-size: 0.78rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgba(150, 200, 255, 0.6);
+    margin-bottom: 3rem;
+    font-weight: 400;
+}
+
+.loading-bar-wrap {
+    width: 220px;
+    height: 3px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+}
+
+.loading-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #00b4ff, #4d9fff);
+    border-radius: 3px;
+    animation: loadBar 4.5s ease-in-out forwards;
+    box-shadow: 0 0 8px rgba(0, 180, 255, 0.6);
+}
+
+@keyframes loadBar {
+    0% { width: 0%; }
+    60% { width: 75%; }
+    100% { width: 100%; }
+}
+
+.loading-status {
+    font-size: 0.72rem;
+    color: rgba(150, 200, 255, 0.5);
+    letter-spacing: 0.1em;
+    animation: blink 1.5s ease-in-out infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+.loading-particles {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.particle {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: rgba(0, 180, 255, 0.5);
+    border-radius: 50%;
+    animation: particleFloat linear infinite;
+}
+
+@keyframes particleFloat {
+    0% { transform: translateY(100vh) scale(0); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+}
+
+.loader {
+    display: none;
+}
+
+
+/* ===== HEADER ===== */
+.main-header {
+    height: 56px;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.25rem;
+    gap: 1rem;
+    z-index: 100;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 180px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: var(--text-primary);
+}
+
+.logo-icon { font-size: 1.5rem; }
+
+.header-center {
+    flex: 1;
+    max-width: 400px;
+}
+
+.search-container input {
+    width: 100%;
+    padding: 0.55rem 0.875rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    outline: none;
+    transition: var(--transition);
+}
+
+.search-container input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-light);
+}
+
+.header-right {
+    display: flex;
+    gap: 0.4rem;
+}
+
+.icon-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+}
+
+.icon-btn:hover {
+    background: var(--accent);
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* ===== MAIN LAYOUT: 4 COLUMNS ===== */
+.main-container {
+    display: grid;
+    grid-template-columns: 190px minmax(0, 1fr) 160px 360px;
+    height: calc(100vh - 56px);
+    overflow: hidden;
+}
+
+/* ===== CATEGORIES SIDEBAR ===== */
+.categories-sidebar {
+    background: var(--bg-secondary);
+    border-right: 1px solid var(--border);
+    padding: 0.875rem;
+    overflow-y: auto;
+}
+
+.categories-sidebar h3 {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    margin-bottom: 0.6rem;
+    padding-left: 0.4rem;
+}
+
+.category-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.category-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.65rem 0.75rem;
+    border-radius: var(--radius-sm);
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: var(--transition);
+    text-align: left;
+    font-weight: 500;
+    width: 100%;
+}
+
+.category-btn:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.category-btn.active {
+    background: var(--accent-light);
+    color: var(--accent);
+    font-weight: 600;
+}
+
+/* ===== MENU SECTION - NARROWER ===== */
+.menu-section {
+    padding: 0.875rem;
+    overflow-y: auto;
+    background: var(--bg-primary);
+    min-width: 0;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.875rem;
+}
+
+.section-header h2 {
+    font-size: 1.15rem;
+    font-weight: 600;
+}
+
+#item-count {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+
+/* ===== FOOD GRID: EXACTLY 4 PER ROW ===== */
+.food-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+}
+
+/* ===== FOOD CARD - COMPACT ===== */
+.food-card {
+    background: var(--glass);
+    backdrop-filter: blur(20px);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: var(--transition);
+    cursor: pointer;
+    position: relative;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.food-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+    border-color: var(--accent);
+}
+
+.food-card.selected {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-light), var(--shadow);
+    transform: scale(1.02);
+}
+
+.food-card:active {
+    transform: scale(0.97);
+}
+
+.food-card .card-image {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    background: var(--bg-tertiary);
+    display: block;
+}
+
+.food-card .card-image-placeholder {
+    width: 100%;
+    height: 160px;
+    background: linear-gradient(135deg, var(--bg-tertiary), var(--bg-secondary));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3.5rem;
+}
+
+.food-card .card-body {
+    padding: 0.6rem;
+}
+
+.food-card .card-title {
+    font-weight: 600;
+    font-size: 0.8rem;
+    margin-bottom: 0.2rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.food-card .card-price {
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.qty-badge {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: var(--accent);
+    color: white;
+    font-weight: 800;
+    font-size: 0.75rem;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+/* ===== QTY CONTROLS PANEL - ONLY 2 BIG BUTTONS ===== */
+.qty-controls-panel {
+    background: var(--bg-secondary);
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem 0.75rem;
+    gap: 1.5rem;
+}
+
+.mega-qty-btn {
+    width: 120px;
+    height: 140px;
+    border-radius: 20px;
+    border: 3px solid var(--border);
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    font-size: 3.5rem;
+    font-weight: 900;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.mega-qty-btn:hover:not(:disabled) {
+    transform: scale(1.05);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+
+.mega-qty-btn:active:not(:disabled) {
+    transform: scale(0.95);
+}
+
+.mega-qty-btn:disabled {
+    opacity: 0.15;
+    cursor: not-allowed;
+}
+
+.mega-qty-btn.minus {
+    border-color: rgba(255, 51, 102, 0.3);
+    color: var(--danger);
+}
+
+.mega-qty-btn.minus:hover:not(:disabled) {
+    background: rgba(255, 51, 102, 0.15);
+    border-color: var(--danger);
+    box-shadow: 0 8px 24px rgba(255, 51, 102, 0.2);
+}
+
+.mega-qty-btn.plus {
+    border-color: rgba(255, 107, 53, 0.3);
+    color: var(--accent);
+}
+
+.mega-qty-btn.plus:hover:not(:disabled) {
+    background: var(--accent-light);
+    border-color: var(--accent);
+    box-shadow: 0 8px 24px rgba(255, 107, 53, 0.2);
+}
+
+/* ===== CART SIDEBAR ===== */
+.cart-sidebar {
+    background: var(--bg-secondary);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.cart-header {
+    padding: 0.875rem 1rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.cart-header h3 {
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.text-btn {
+    background: none;
+    border: none;
+    color: var(--danger);
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    transition: var(--transition);
+}
+
+.text-btn:hover {
+    background: rgba(255, 51, 102, 0.1);
+}
+
+/* ===== CART ITEMS ===== */
+.cart-items {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.5rem 0.875rem 0.5rem;
+}
+
+.empty-cart {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--text-muted);
+    text-align: center;
+    padding: 2rem;
+}
+
+.empty-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    opacity: 0.5;
+}
+
+.cart-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.75rem;
+    background: var(--bg-card);
+    border-radius: var(--radius-sm);
+    margin-bottom: 0.5rem;
+    border: 2px solid var(--border);
+    transition: var(--transition);
+    cursor: pointer;
+}
+
+.cart-item:hover {
+    border-color: var(--accent);
+    background: var(--bg-hover);
+}
+
+.cart-item.active {
+    border-color: var(--accent);
+    background: var(--accent-light);
+}
+
+.cart-item-image {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    object-fit: cover;
+    background: var(--bg-tertiary);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+}
+
+.cart-item-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.cart-item-name {
+    font-weight: 600;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cart-item-meta {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    margin-top: 0.1rem;
+}
+
+.cart-item-qty {
+    font-weight: 800;
+    font-size: 0.95rem;
+    color: var(--accent);
+    min-width: 24px;
+    text-align: center;
+}
+
+.cart-item-total {
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    min-width: 55px;
+    text-align: right;
+}
+
+.remove-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: none;
+    background: rgba(255, 51, 102, 0.15);
+    color: var(--danger);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    transition: var(--transition);
+    flex-shrink: 0;
+}
+
+.remove-btn:hover {
+    background: var(--danger);
+    color: white;
+}
+
+/* ===== CART FOOTER ===== */
+.cart-footer {
+    padding: 0.875rem 1rem;
+    border-top: 1px solid var(--border);
+    background: var(--bg-tertiary);
+}
+
+.bill-summary {
+    margin-bottom: 0.6rem;
+}
+
+.bill-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.3rem 0;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+.bill-row.grand-total {
+    border-top: 2px solid var(--border);
+    margin-top: 0.3rem;
+    padding-top: 0.5rem;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.discount-row { color: var(--success); }
+.discount-row.hidden { display: none; }
+
+.checkout-btn {
+    width: 100%;
+    padding: 0.875rem;
+    border-radius: var(--radius-sm);
+    border: none;
+    background: var(--accent);
+    color: white;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: var(--transition);
+    box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+}
+
+.checkout-btn:hover {
+    background: var(--accent-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(255, 107, 53, 0.4);
+}
+
+.checkout-btn:active { transform: translateY(0); }
+
+#checkout-count {
+    font-size: 0.75rem;
+    opacity: 0.9;
+    font-weight: 500;
+}
+
+/* ===== MODAL ===== */
+.modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal.active { display: flex; }
+
+.modal-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+}
+
+.modal-content {
+    background: var(--bg-secondary);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    box-shadow: var(--shadow);
+    animation: modalIn 0.25s ease;
+}
+
+.modal-content.large { max-width: 650px; }
+
+@keyframes modalIn {
+    from { opacity: 0; transform: scale(0.95) translateY(15px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.modal-header {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h2 {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.close-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: none;
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+}
+
+.close-btn:hover {
+    background: var(--danger);
+    color: white;
+}
+
+.modal-body {
+    padding: 1.25rem;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.modal-footer {
+    padding: 0.875rem 1.25rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 0.6rem;
+    justify-content: flex-end;
+}
+
+/* ===== SETTINGS TABS ===== */
+.settings-tabs {
+    display: flex;
+    gap: 0.4rem;
+    margin-bottom: 1.25rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.4rem;
+    overflow-x: auto;
+}
+
+.tab-btn {
+    padding: 0.45rem 0.875rem;
+    border-radius: var(--radius-sm);
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: var(--transition);
+    font-size: 0.88rem;
+}
+
+.tab-btn.active {
+    background: var(--accent-light);
+    color: var(--accent);
+}
+
+.tab-content { display: none; }
+.tab-content.active { display: block; animation: fadeIn 0.2s ease; }
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* ===== FORMS ===== */
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.4rem;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 0.6rem 0.8rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    outline: none;
+    transition: var(--transition);
+    font-family: inherit;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: var(--accent);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem;
+}
+
+.btn {
+    padding: 0.65rem 1.1rem;
+    border-radius: var(--radius-sm);
+    border: none;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    font-family: inherit;
+}
+
+.btn.primary {
+    background: var(--accent);
+    color: white;
+}
+
+.btn.primary:hover {
+    background: var(--accent-hover);
+    transform: translateY(-1px);
+}
+
+.btn.secondary {
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+}
+
+.btn.secondary:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+/* ===== MENU LIST ===== */
+.menu-list-container {
+    margin-top: 1.25rem;
+    border-top: 1px solid var(--border);
+    padding-top: 0.8rem;
+}
+
+.menu-list-container h4 {
+    margin-bottom: 0.8rem;
+    font-size: 0.9rem;
+}
+
+.menu-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-height: 260px;
+    overflow-y: auto;
+}
+
+.menu-list-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.6rem;
+    background: var(--bg-card);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+}
+
+.menu-list-item img {
+    width: 34px;
+    height: 34px;
+    border-radius: 6px;
+    object-fit: cover;
+    background: var(--bg-tertiary);
+}
+
+.menu-list-item .item-info { flex: 1; }
+.menu-list-item .item-name { font-weight: 600; font-size: 0.82rem; }
+.menu-list-item .item-meta { font-size: 0.72rem; color: var(--text-muted); }
+
+.menu-list-item .item-actions {
+    display: flex;
+    gap: 0.2rem;
+}
+
+.item-actions button {
+    width: 24px;
+    height: 24px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+    font-size: 0.75rem;
+}
+
+.edit-btn {
+    background: var(--accent-light);
+    color: var(--accent);
+}
+
+.delete-btn {
+    background: rgba(255, 51, 102, 0.15);
+    color: var(--danger);
+}
+
+/* ===== THEME OPTIONS ===== */
+.theme-options {
+    display: flex;
+    gap: 0.4rem;
+}
+
+.theme-option {
+    flex: 1;
+    padding: 0.6rem;
+    border-radius: var(--radius-sm);
+    border: 2px solid var(--border);
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-weight: 500;
+    transition: var(--transition);
+    font-size: 0.85rem;
+}
+
+.theme-option.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-light);
+}
+
+.color-picker {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.color-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 3px solid transparent;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.color-btn.active {
+    border-color: var(--text-primary);
+    transform: scale(1.1);
+}
+
+/* ===== RECEIPT ===== */
+.receipt-paper {
+    background: white;
+    color: #1a1a2e;
+    padding: 1.5rem;
+    border-radius: 8px;
+    font-family: 'Courier New', monospace;
+    line-height: 1.5;
+}
+
+.receipt-header {
+    text-align: center;
+    border-bottom: 2px dashed #ccc;
+    padding-bottom: 0.8rem;
+    margin-bottom: 0.8rem;
+}
+
+.receipt-header h2 {
+    font-size: 1.3rem;
+    margin-bottom: 0.2rem;
+}
+
+.receipt-header p {
+    font-size: 0.78rem;
+    color: #555;
+}
+
+.receipt-items { margin: 0.8rem 0; }
+
+.receipt-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.3rem 0;
+    font-size: 0.82rem;
+}
+
+.receipt-row.header {
+    border-bottom: 1px solid #ccc;
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+}
+
+.receipt-row.total {
+    border-top: 2px solid #1a1a2e;
+    margin-top: 0.4rem;
+    padding-top: 0.4rem;
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+.receipt-footer {
+    text-align: center;
+    margin-top: 1.2rem;
+    padding-top: 0.8rem;
+    border-top: 2px dashed #ccc;
+    font-size: 0.78rem;
+    color: #555;
+}
+
+/* ===== HISTORY ===== */
+.history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.history-item {
+    padding: 0.8rem;
+    background: var(--bg-card);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.history-item:hover { border-color: var(--accent); }
+
+.history-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.3rem;
+}
+
+.history-id {
+    font-weight: 700;
+    color: var(--accent);
+    font-size: 0.85rem;
+}
+
+.history-date {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+}
+
+.history-details {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+}
+
+/* ===== NOTIFICATIONS ===== */
+#notification-container {
+    position: fixed;
+    top: 68px;
+    right: 14px;
+    z-index: 9998;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.notification {
+    padding: 0.8rem 1.1rem;
+    border-radius: var(--radius-sm);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-width: 240px;
+    animation: slideIn 0.25s ease, fadeOut 0.25s ease 2.5s forwards;
+    font-weight: 500;
+    font-size: 0.85rem;
+}
+
+.notification.success { border-left: 4px solid var(--success); }
+.notification.error { border-left: 4px solid var(--danger); }
+.notification.info { border-left: 4px solid var(--accent); }
+
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes fadeOut {
+    to { opacity: 0; transform: translateX(20px); }
+}
+
+/* ===== PRINT ===== */
+@media print {
+    body * { visibility: hidden; }
+    #receipt-modal, #receipt-modal * { visibility: visible; }
+    #receipt-modal {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        display: flex !important;
+    }
+    .modal-overlay, .modal-header, .modal-footer, .close-btn { display: none !important; }
+    .modal-content {
+        box-shadow: none;
+        border: none;
+        max-width: 100%;
+        max-height: none;
+    }
+    .receipt-paper { padding: 0; }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1200px) {
+    .main-container { grid-template-columns: 170px minmax(0, 1fr) 140px 320px; }
+    .mega-qty-btn { width: 110px; height: 130px; font-size: 3rem; }
+    .food-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 1024px) {
+    .main-container { grid-template-columns: 160px minmax(0, 1fr) 120px 300px; }
+    .mega-qty-btn { width: 100px; height: 120px; font-size: 2.8rem; }
+    .food-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 900px) {
+    .main-container { grid-template-columns: 150px minmax(0, 1fr) 100px 280px; }
+    .mega-qty-btn { width: 90px; height: 110px; font-size: 2.5rem; }
+    .food-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+    .main-container {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr auto;
+    }
+    .categories-sidebar { display: none; }
+    .qty-controls-panel {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 100px;
+        flex-direction: row;
+        padding: 0.5rem 1rem;
+        z-index: 300;
+        border-top: 2px solid var(--border);
+        gap: 1rem;
+    }
+    .mega-qty-btn {
+        width: 50%;
+        height: 80px;
+        font-size: 2.5rem;
+    }
+    .cart-sidebar {
+        position: fixed;
+        bottom: 100px;
+        left: 0;
+        right: 0;
+        height: 50vh;
+        transform: translateY(100%);
+        transition: transform 0.3s ease;
+        z-index: 200;
+    }
+    .cart-sidebar.open { transform: translateY(0); }
+    .food-grid { grid-template-columns: repeat(2, 1fr); gap: 0.6rem; }
+    .main-header { padding: 0 0.6rem; height: 52px; }
+    .logo-text { display: none; }
+}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--bg-tertiary); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+/* ===== SALES SUMMARY ===== */
+.sales-summary-header {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.2rem;
+}
+
+.sales-stat-box {
+    flex: 1;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0.9rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.sales-stat-box.highlight {
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 10%, var(--bg-card));
+}
+
+.sales-stat-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.sales-stat-value {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--accent);
+}
+
+.sales-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+}
+
+.sales-table th {
+    padding: 0.6rem 0.75rem;
+    background: var(--bg-tertiary);
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+}
+
+.sales-table tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+}
+
+.sales-table tbody tr:hover {
+    background: var(--bg-tertiary);
+}
+
+.sales-table td {
+    padding: 0.65rem 0.75rem;
+    color: var(--text-primary);
+}
+
+.sales-total-row td {
+    padding: 0.75rem;
+    background: var(--bg-tertiary);
+    border-top: 2px solid var(--accent);
+    color: var(--text-primary);
+}
+
+</style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<base target="_blank">
+</head>
+<body>
+    <div id="app">
+        <div id="loading-screen">
+            <div class="loading-particles" id="loading-particles"></div>
+            <div class="loading-content">
+                <div class="loading-logo-wrap">
+                    <img class="loading-logo" src="data:image/jpeg;base64,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" alt="HBILLSOFT Logo">
+                    <div class="loading-logo-ring"></div>
+                </div>
+                <div class="loading-appname">HBILLSOFT</div>
+                <div class="loading-tagline">Smart Billing Solution</div>
+                <div class="loading-bar-wrap">
+                    <div class="loading-bar"></div>
+                </div>
+                <div class="loading-status">Initializing...</div>
+            </div>
+            <div class="loader"></div>
+        </div>
+
+        <header class="main-header">
+            <div class="header-left">
+                <div class="logo">
+                    <img src="data:image/jpeg;base64,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" alt="logo" style="width:32px;height:32px;border-radius:8px;object-fit:cover;">
+                    <span class="logo-text" style="font-weight:900;letter-spacing:0.08em;background:linear-gradient(90deg,#00b4ff,#4d9fff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">HBILLSOFT</span>
+                </div>
+            </div>
+            <div class="header-center">
+                <div class="search-container">
+                    <input type="text" id="search-input" placeholder="🔍 Search food items..." autocomplete="off">
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="icon-btn" id="theme-toggle" title="Toggle Theme">🌙</button>
+                <button class="icon-btn" id="settings-btn" title="Settings">⚙️</button>
+                <button class="icon-btn" id="history-btn" title="Sales Summary">📊</button>
+                <button class="icon-btn" id="exit-btn" title="Exit" onclick="confirmExit()" style="background:#2a0a0a;border-color:rgba(255,51,102,0.4);color:#ff3366;">✕</button>
+            </div>
+        </header>
+
+        <div class="main-container">
+            <aside class="categories-sidebar">
+                <h3>Categories</h3>
+                <nav class="category-list" id="category-list">
+                    <button class="category-btn active" data-category="all">📋 All Items</button>
+                    <button class="category-btn" data-category="burgers">🍔 Burgers</button>
+                    <button class="category-btn" data-category="pizza">🍕 Pizza</button>
+                    <button class="category-btn" data-category="drinks">🥤 Drinks</button>
+                    <button class="category-btn" data-category="desserts">🍰 Desserts</button>
+                    <button class="category-btn" data-category="south-indian">🍛 South Indian</button>
+                    <button class="category-btn" data-category="north-indian">🥘 North Indian</button>
+                </nav>
+            </aside>
+
+            <main class="menu-section">
+                <div class="section-header">
+                    <h2 id="current-category-title">All Items</h2>
+                    <span id="item-count">0 items</span>
+                </div>
+                <div class="food-grid" id="food-grid"></div>
+            </main>
+
+            <aside class="qty-controls-panel" id="qty-controls-panel">
+                <button class="mega-qty-btn minus" id="global-minus" onclick="adjustSelected(-1)" disabled>−</button>
+                <button class="mega-qty-btn plus" id="global-plus" onclick="adjustSelected(1)" disabled>+</button>
+            </aside>
+
+            <aside class="cart-sidebar">
+                <div class="cart-header">
+                    <h3>🛒 Current Order</h3>
+                    <button class="text-btn" id="clear-cart">Clear</button>
+                </div>
+
+                <div class="cart-items" id="cart-items">
+                    <div class="empty-cart">
+                        <span class="empty-icon">🛒</span>
+                        <p>Cart is empty</p>
+                        <small>Tap a food item to select it</small>
+                    </div>
+                </div>
+
+                <div class="cart-footer">
+                    <div class="bill-summary">
+                        <div class="bill-row">
+                            <span>Subtotal</span>
+                            <span id="subtotal">₹0.00</span>
+                        </div>
+                        <div class="bill-row">
+                            <span>GST incl. (<span id="gst-rate">5</span>%)</span>
+                            <span id="gst-amount">₹0.00</span>
+                        </div>
+                        <div class="bill-row discount-row hidden" id="discount-row">
+                            <span>Discount</span>
+                            <span id="discount-amount">-₹0.00</span>
+                        </div>
+                        <div class="bill-row grand-total">
+                            <span>Grand Total</span>
+                            <span id="grand-total">₹0.00</span>
+                        </div>
+                    </div>
+                    <button class="checkout-btn" id="checkout-btn">
+                        <span>Confirm</span>
+                        <span id="checkout-count">0 items</span>
+                    </button>
+                </div>
+            </aside>
+        </div>
+
+        <div id="notification-container"></div>
+
+        <div class="modal" id="settings-modal">
+            <div class="modal-overlay"></div>
+            <div class="modal-content large">
+                <div class="modal-header">
+                    <h2>⚙️ Settings</h2>
+                    <button class="close-btn" id="close-settings">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="settings-tabs">
+                        <button class="tab-btn active" data-tab="general">General</button>
+                        <button class="tab-btn" data-tab="menu">Menu Manager</button>
+                        <button class="tab-btn" data-tab="tax">Tax & Billing</button>
+                        <button class="tab-btn" data-tab="appearance">Appearance</button>
+                    </div>
+
+                    <div class="tab-content active" id="tab-general">
+                        <div class="form-group">
+                            <label>Shop Name <small style="color:var(--text-muted)">(used on bills)</small></label>
+                            <input type="text" id="setting-restaurant-name" placeholder="Your Shop Name">
+                        </div>
+                        <div class="form-group">
+                            <label>Shop Address</label>
+                            <textarea id="setting-address" rows="2" placeholder="Address"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Contact Number</label>
+                            <input type="text" id="setting-phone" placeholder="Phone Number">
+                        </div>
+                        <div class="form-group">
+                            <label>GST Number</label>
+                            <input type="text" id="setting-gstin" placeholder="GSTIN">
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="tab-menu">
+                        <div class="menu-manager">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Item Name</label>
+                                    <input type="text" id="new-item-name" placeholder="Item name">
+                                </div>
+                                <div class="form-group">
+                                    <label>Price (₹)</label>
+                                    <input type="number" id="new-item-price" placeholder="0.00" min="0" step="0.01">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Category</label>
+                                    <select id="new-item-category">
+                                        <option value="burgers">Burgers</option>
+                                        <option value="pizza">Pizza</option>
+                                        <option value="drinks">Drinks</option>
+                                        <option value="desserts">Desserts</option>
+                                        <option value="south-indian">South Indian</option>
+                                        <option value="north-indian">North Indian</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Image</label>
+                                    <input type="file" id="new-item-image" accept="image/*">
+                                </div>
+                            </div>
+                            <button class="btn primary" id="add-item-btn">➕ Add Item</button>
+                        </div>
+                        <div class="menu-list-container">
+                            <h4>Current Menu Items</h4>
+                            <div class="menu-list" id="settings-menu-list"></div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="tab-tax">
+                        <div class="form-group">
+                            <label>GST Rate (%)</label>
+                            <input type="number" id="setting-gst-rate" min="0" max="100" step="0.01" value="5">
+                        </div>
+                        <div class="form-group">
+                            <label>Discount (%)</label>
+                            <input type="number" id="setting-discount" min="0" max="100" step="0.01" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Currency Symbol</label>
+                            <input type="text" id="setting-currency" value="₹" maxlength="3">
+                        </div>
+                        <div class="form-group">
+                            <label>Invoice Prefix</label>
+                            <input type="text" id="setting-invoice-prefix" value="INV-" maxlength="10">
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="tab-appearance">
+                        <div class="form-group">
+                            <label>Theme</label>
+                            <div class="theme-options">
+                                <button class="theme-option active" data-theme="dark">🌙 Dark</button>
+                                <button class="theme-option" data-theme="light">☀️ Light</button>
+                                <button class="theme-option" data-theme="auto">⚡ Auto</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Accent Color</label>
+                            <div class="color-picker">
+                                <button class="color-btn active" style="background:#ff6b35" data-color="#ff6b35"></button>
+                                <button class="color-btn" style="background:#00d4aa" data-color="#00d4aa"></button>
+                                <button class="color-btn" style="background:#ff3366" data-color="#ff3366"></button>
+                                <button class="color-btn" style="background:#448aff" data-color="#448aff"></button>
+                                <button class="color-btn" style="background:#ffaa00" data-color="#ffaa00"></button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Font Size</label>
+                            <input type="range" id="font-size-slider" min="10" max="24" value="14">
+                            <span id="font-size-value">14px</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn secondary" id="reset-settings">Reset to Default</button>
+                    <button class="btn primary" id="save-settings">Save Settings</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal" id="receipt-modal">
+            <div class="modal-overlay"></div>
+            <div class="modal-content receipt-modal">
+                <div class="modal-header">
+                    <h2>🧾 Receipt</h2>
+                    <button class="close-btn" id="close-receipt">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div id="receipt-content" class="receipt-paper"></div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn secondary" id="new-order-btn">🆕 New Order</button>
+                    <button class="btn primary" id="print-receipt-btn">🖨️ Print</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal" id="history-modal">
+            <div class="modal-overlay"></div>
+            <div class="modal-content large">
+                <div class="modal-header">
+                    <h2>📊 Sales Summary</h2>
+                    <button class="close-btn" id="close-history">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="history-list" id="history-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal" id="edit-item-modal">
+            <div class="modal-overlay"></div>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>✏️ Edit Item</h2>
+                    <button class="close-btn" id="close-edit">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="edit-item-id">
+                    <div class="form-group">
+                        <label>Item Name</label>
+                        <input type="text" id="edit-item-name">
+                    </div>
+                    <div class="form-group">
+                        <label>Price</label>
+                        <input type="number" id="edit-item-price" min="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="edit-item-category">
+                            <option value="burgers">Burgers</option>
+                            <option value="pizza">Pizza</option>
+                            <option value="drinks">Drinks</option>
+                            <option value="desserts">Desserts</option>
+                            <option value="south-indian">South Indian</option>
+                            <option value="north-indian">North Indian</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Change Image</label>
+                        <input type="file" id="edit-item-image" accept="image/*">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn secondary" id="cancel-edit">Cancel</button>
+                    <button class="btn primary" id="save-edit-btn">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+/**
+ * RestoPOS - Restaurant Point of Sale
+ */
+
+const defaultMenu = [
+    { id: 1, name: "Classic Cheeseburger", price: 149, category: "burgers", image: "🍔" },
+    { id: 2, name: "Double Bacon Burger", price: 249, category: "burgers", image: "🥓" },
+    { id: 3, name: "Veggie Supreme", price: 129, category: "burgers", image: "🥬" },
+    { id: 4, name: "Spicy Chicken Burger", price: 179, category: "burgers", image: "🍗" },
+    { id: 5, name: "Margherita Pizza", price: 199, category: "pizza", image: "🍕" },
+    { id: 6, name: "Pepperoni Feast", price: 299, category: "pizza", image: "🍕" },
+    { id: 7, name: "Veggie Paradise", price: 249, category: "pizza", image: "🍕" },
+    { id: 8, name: "BBQ Chicken Pizza", price: 349, category: "pizza", image: "🍕" },
+    { id: 9, name: "Coca Cola", price: 49, category: "drinks", image: "🥤" },
+    { id: 10, name: "Fresh Lime Soda", price: 59, category: "drinks", image: "🍋" },
+    { id: 11, name: "Mango Lassi", price: 79, category: "drinks", image: "🥭" },
+    { id: 12, name: "Iced Coffee", price: 99, category: "drinks", image: "☕" },
+    { id: 13, name: "Chocolate Brownie", price: 129, category: "desserts", image: "🍫" },
+    { id: 14, name: "Gulab Jamun", price: 89, category: "desserts", image: "🍮" },
+    { id: 15, name: "Ice Cream Sundae", price: 149, category: "desserts", image: "🍨" },
+    { id: 16, name: "Rasmalai", price: 99, category: "desserts", image: "🍮" },
+    { id: 17, name: "Masala Dosa", price: 89, category: "south-indian", image: "🥞" },
+    { id: 18, name: "Idli Sambar", price: 69, category: "south-indian", image: "🍚" },
+    { id: 19, name: "Medu Vada", price: 79, category: "south-indian", image: "🍩" },
+    { id: 20, name: "Uttapam", price: 99, category: "south-indian", image: "🥞" },
+    { id: 21, name: "Butter Chicken", price: 299, category: "north-indian", image: "🍗" },
+    { id: 22, name: "Paneer Tikka", price: 249, category: "north-indian", image: "🧀" },
+    { id: 23, name: "Dal Makhani", price: 199, category: "north-indian", image: "🍲" },
+    { id: 24, name: "Naan Basket", price: 129, category: "north-indian", image: "🍞" }
+];
+
+const defaultSettings = {
+    restaurantName: "RestoPOS",
+    address: "123 Food Street, Culinary City",
+    phone: "+91 98765 43210",
+    gstin: "22AAAAA0000A1Z5",
+    logo: "🍽️",
+    gstRate: 5,
+    discount: 0,
+    currency: "₹",
+    invoicePrefix: "INV-",
+    theme: "dark",
+    accentColor: "#ff6b35",
+    fontSize: 14
+};
+
+let menu = [];
+let cart = [];
+let settings = {};
+let orders = [];
+let currentCategory = "all";
+let selectedItemId = null;
+
+const STORAGE_KEYS = {
+    MENU: "pos_menu",
+    CART: "pos_cart",
+    SETTINGS: "pos_settings",
+    ORDERS: "pos_orders"
+};
+
+function loadFromStorage(key, defaultValue) {
+    try {
+        const data = localStorage.getItem(key);
+        return data ? JSON.parse(data) : defaultValue;
+    } catch {
+        return defaultValue;
+    }
+}
+
+function saveToStorage(key, data) {
+    try {
+        localStorage.setItem(key, JSON.stringify(data));
+    } catch (e) {
+        console.warn("Storage error:", e);
+    }
+}
+
+function initStorage() {
+    menu = loadFromStorage(STORAGE_KEYS.MENU, null);
+    if (!menu || !Array.isArray(menu) || menu.length === 0) {
+        menu = JSON.parse(JSON.stringify(defaultMenu));
+        saveToStorage(STORAGE_KEYS.MENU, menu);
+    }
+    cart = loadFromStorage(STORAGE_KEYS.CART, []);
+    if (!Array.isArray(cart)) cart = [];
+    settings = loadFromStorage(STORAGE_KEYS.SETTINGS, null);
+    if (!settings || typeof settings !== "object") {
+        settings = JSON.parse(JSON.stringify(defaultSettings));
+    }
+    orders = loadFromStorage(STORAGE_KEYS.ORDERS, []);
+    if (!Array.isArray(orders)) orders = [];
+}
+
+function getEl(id) { return document.getElementById(id); }
+
+const els = {};
+
+function cacheElements() {
+    const ids = [
+        "food-grid", "cart-items", "subtotal", "gst-amount", "gst-rate",
+        "grand-total", "discount-row", "discount-amount", "checkout-count",
+        "category-list", "search-input", "item-count", "current-category-title",
+        "restaurant-name-display", "logo-display", "loading-screen",
+        "global-qty", "global-minus", "global-plus",
+        "receipt-content", "notification-container", "settings-menu-list",
+        "history-list", "settings-modal", "receipt-modal", "history-modal",
+        "edit-item-modal", "settings-btn", "close-settings", "save-settings",
+        "reset-settings", "clear-cart", "checkout-btn", "close-receipt",
+        "print-receipt-btn", "new-order-btn", "history-btn", "close-history",
+        "theme-toggle", "add-item-btn", "close-edit", "cancel-edit",
+        "save-edit-btn", "setting-restaurant-name", "setting-address",
+        "setting-phone", "setting-gstin", "setting-logo", "setting-gst-rate",
+        "setting-discount", "setting-currency", "setting-invoice-prefix",
+        "edit-item-id", "edit-item-name", "edit-item-price", "edit-item-category",
+        "new-item-name", "new-item-price", "new-item-category", "new-item-image",
+        "font-size-slider", "font-size-value"
+    ];
+    ids.forEach(id => { els[id] = getEl(id); });
+}
+
+function hideLoadingScreen() {
+    // Generate floating particles
+    const container = document.getElementById('loading-particles');
+    if (container) {
+        for (let i = 0; i < 18; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            p.style.left = Math.random() * 100 + '%';
+            p.style.width = p.style.height = (Math.random() * 3 + 2) + 'px';
+            p.style.animationDuration = (Math.random() * 6 + 5) + 's';
+            p.style.animationDelay = (Math.random() * 4) + 's';
+            p.style.opacity = Math.random() * 0.6 + 0.2;
+            container.appendChild(p);
+        }
+    }
+    // Update status text during load
+    const status = document.querySelector('.loading-status');
+    const messages = ['Loading menu...', 'Setting up cart...', 'Almost ready...', 'Welcome!'];
+    let i = 0;
+    const interval = setInterval(() => {
+        if (status && i < messages.length) status.textContent = messages[i++];
+    }, 1100);
+
+    setTimeout(() => {
+        clearInterval(interval);
+        const loader = els["loading-screen"];
+        if (loader) {
+            loader.style.transition = 'opacity 0.6s ease';
+            loader.style.opacity = '0';
+            setTimeout(() => {
+                loader.classList.add("done");
+                loader.style.display = "none";
+            }, 600);
+        }
+    }, 5000);
+}
+
+function showNotification(message, type) {
+    const container = els["notification-container"];
+    if (!container) return;
+    const notif = document.createElement("div");
+    notif.className = `notification ${type || "info"}`;
+    const icons = { success: "✅", error: "❌", info: "ℹ️" };
+    notif.innerHTML = `<span>${icons[type] || "ℹ️"}</span><span>${message}</span>`;
+    container.appendChild(notif);
+    setTimeout(() => {
+        if (notif.parentNode) notif.remove();
+    }, 3000);
+}
+
+function selectItem(id) {
+    const item = menu.find(m => m.id === id);
+    if (!item) return;
+
+    selectedItemId = id;
+
+    const existing = cart.find(c => c.id === id);
+    if (!existing) {
+        cart.push({
+            id: item.id,
+            name: item.name,
+            price: item.price,
+            qty: 1,
+            image: item.image,
+            imageData: item.imageData
+        });
+        saveToStorage(STORAGE_KEYS.CART, cart);
+        showNotification(`${item.name} added`, "success");
+    }
+
+    updateGlobalController();
+    renderMenu();
+    renderCart();
+}
+
+function adjustSelected(delta) {
+    if (!selectedItemId) return;
+
+    const existing = cart.find(c => c.id === selectedItemId);
+    if (!existing) {
+        if (delta > 0) selectItem(selectedItemId);
+        return;
+    }
+
+    existing.qty += delta;
+    if (existing.qty <= 0) {
+        cart = cart.filter(c => c.id !== selectedItemId);
+        selectedItemId = null;
+    }
+
+    saveToStorage(STORAGE_KEYS.CART, cart);
+    updateGlobalController();
+    renderMenu();
+    renderCart();
+}
+
+function updateGlobalController() {
+    const minusBtn = els["global-minus"];
+    const plusBtn = els["global-plus"];
+
+    if (!minusBtn || !plusBtn) return;
+
+    if (!selectedItemId) {
+        minusBtn.disabled = true;
+        plusBtn.disabled = true;
+        return;
+    }
+
+    const item = menu.find(m => m.id === selectedItemId);
+    const cartItem = cart.find(c => c.id === selectedItemId);
+
+    if (!item) {
+        selectedItemId = null;
+        updateGlobalController();
+        return;
+    }
+
+    minusBtn.disabled = !cartItem || cartItem.qty <= 0;
+    plusBtn.disabled = false;
+}
+
+function getCategoryName(cat) {
+    const names = {
+        all: "All Items",
+        burgers: "Burgers",
+        pizza: "Pizza",
+        drinks: "Drinks",
+        desserts: "Desserts",
+        "south-indian": "South Indian",
+        "north-indian": "North Indian"
+    };
+    return names[cat] || cat;
+}
+
+function renderMenu() {
+    const grid = els["food-grid"];
+    const countEl = els["item-count"];
+    const titleEl = els["current-category-title"];
+
+    if (!grid) return;
+
+    let filtered = menu;
+    if (currentCategory !== "all") {
+        filtered = menu.filter(item => item.category === currentCategory);
+    }
+
+    const searchInput = els["search-input"];
+    const search = searchInput ? searchInput.value.trim().toLowerCase() : "";
+    if (search) {
+        filtered = filtered.filter(item => item.name.toLowerCase().includes(search));
+    }
+
+    if (countEl) countEl.textContent = `${filtered.length} items`;
+    if (titleEl) titleEl.textContent = getCategoryName(currentCategory);
+
+    if (filtered.length === 0) {
+        grid.innerHTML = `
+            <div class="empty-cart" style="grid-column: 1/-1; padding: 3rem;">
+                <span style="font-size: 3rem;">🔍</span>
+                <p>No items found</p>
+            </div>
+        `;
+        return;
+    }
+
+    const curr = settings.currency || "₹";
+
+    grid.innerHTML = filtered.map(item => {
+        const cartItem = cart.find(c => c.id === item.id);
+        const qty = cartItem ? cartItem.qty : 0;
+        const isSelected = selectedItemId === item.id;
+
+        const imgDisplay = item.imageData 
+            ? `<img src="${item.imageData}" class="card-image" alt="${item.name}">`
+            : `<div class="card-image-placeholder">${item.image || "🍽️"}</div>`;
+
+        const badge = qty > 0 ? `<div class="qty-badge">${qty}</div>` : "";
+
+        return `
+            <div class="food-card ${isSelected ? "selected" : ""}" onclick="selectItem(${item.id})">
+                ${imgDisplay}
+                ${badge}
+                <div class="card-body">
+                    <div class="card-title">${item.name}</div>
+                    <div class="card-price">${curr}${item.price.toFixed(2)}</div>
+                </div>
+            </div>
+        `;
+    }).join("");
+}
+
+function removeFromCart(id) {
+    cart = cart.filter(c => c.id !== id);
+    if (selectedItemId === id) selectedItemId = null;
+    saveToStorage(STORAGE_KEYS.CART, cart);
+    updateGlobalController();
+    renderMenu();
+    renderCart();
+    showNotification("Item removed", "info");
+}
+
+function clearCart() {
+    if (cart.length === 0) return;
+    if (!confirm("Clear all items from cart?")) return;
+    cart = [];
+    selectedItemId = null;
+    saveToStorage(STORAGE_KEYS.CART, cart);
+    updateGlobalController();
+    renderMenu();
+    renderCart();
+    showNotification("Cart cleared", "info");
+}
+
+function selectCartItem(id) {
+    selectedItemId = id;
+    updateGlobalController();
+    renderMenu();
+    renderCart();
+}
+
+function renderCart() {
+    const cartItemsEl = els["cart-items"];
+    if (!cartItemsEl) return;
+
+    if (cart.length === 0) {
+        cartItemsEl.innerHTML = `
+            <div class="empty-cart">
+                <span class="empty-icon">🛒</span>
+                <p>Cart is empty</p>
+                <small>Tap a food item to select it</small>
+            </div>
+        `;
+    } else {
+        const curr = settings.currency || "₹";
+        cartItemsEl.innerHTML = cart.map(item => {
+            const isActive = selectedItemId === item.id;
+            const imgDisplay = item.imageData 
+                ? `<img src="${item.imageData}" class="cart-item-image">`
+                : `<div class="cart-item-image">${item.image || "🍽️"}</div>`;
+
+            return `
+                <div class="cart-item ${isActive ? "active" : ""}" onclick="selectCartItem(${item.id})">
+                    ${imgDisplay}
+                    <div class="cart-item-info">
+                        <div class="cart-item-name">${item.name}</div>
+                        <div class="cart-item-meta">${curr}${item.price.toFixed(2)} x ${item.qty}</div>
+                    </div>
+                    <div class="cart-item-qty">${item.qty}</div>
+                    <div class="cart-item-total">${curr}${(item.price * item.qty).toFixed(2)}</div>
+                    <button class="remove-btn" onclick="event.stopPropagation(); removeFromCart(${item.id})">🗑</button>
+                </div>
+            `;
+        }).join("");
+    }
+
+    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+    const gstRate = settings.gstRate || 0;
+    const discountRate = settings.discount || 0;
+    const gstAmount = subtotal - (subtotal / (1 + gstRate / 100));
+    const discountAmount = subtotal * (discountRate / 100);
+    const grandTotal = subtotal - discountAmount;
+    const curr = settings.currency || "₹";
+
+    const subtotalEl = els["subtotal"];
+    const gstAmountEl = els["gst-amount"];
+    const gstRateEl = els["gst-rate"];
+    const grandTotalEl = els["grand-total"];
+    const checkoutCountEl = els["checkout-count"];
+    const discountRowEl = els["discount-row"];
+    const discountAmountEl = els["discount-amount"];
+
+    if (subtotalEl) subtotalEl.textContent = `${curr}${(subtotal - gstAmount).toFixed(2)}`;
+    if (gstAmountEl) gstAmountEl.textContent = `${curr}${gstAmount.toFixed(2)}`;
+    if (gstRateEl) gstRateEl.textContent = gstRate;
+    if (grandTotalEl) grandTotalEl.textContent = `${curr}${grandTotal.toFixed(2)}`;
+    if (checkoutCountEl) checkoutCountEl.textContent = `${cart.reduce((a, b) => a + b.qty, 0)} items`;
+
+    if (discountRate > 0) {
+        if (discountRowEl) discountRowEl.classList.remove("hidden");
+        if (discountAmountEl) discountAmountEl.textContent = `-${curr}${discountAmount.toFixed(2)}`;
+    } else {
+        if (discountRowEl) discountRowEl.classList.add("hidden");
+    }
+}
+
+function generateInvoiceNumber() {
+    const count = (orders || []).length + 1;
+    return `${settings.invoicePrefix || "INV-"}${String(count).padStart(4, "0")}`;
+}
+
+function checkout() {
+    if (cart.length === 0) {
+        showNotification("Cart is empty!", "error");
+        return;
+    }
+
+    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+    const gstRate = settings.gstRate || 0;
+    const discountRate = settings.discount || 0;
+    const gstAmount = subtotal - (subtotal / (1 + gstRate / 100));
+    const discountAmount = subtotal * (discountRate / 100);
+    const grandTotal = subtotal - discountAmount;
+    const invoiceNo = generateInvoiceNumber();
+    const date = new Date();
+
+    const order = {
+        id: invoiceNo,
+        date: date.toISOString(),
+        items: JSON.parse(JSON.stringify(cart)),
+        subtotal,
+        gst: gstAmount,
+        discount: discountAmount,
+        total: grandTotal
+    };
+
+    orders.unshift(order);
+    saveToStorage(STORAGE_KEYS.ORDERS, orders);
+
+    const dateStr = date.toLocaleString("en-IN", { 
+        day: "2-digit", month: "short", year: "numeric", 
+        hour: "2-digit", minute: "2-digit" 
+    });
+    const curr = settings.currency || "₹";
+
+    const receiptEl = els["receipt-content"];
+    if (receiptEl) {
+        receiptEl.innerHTML = `
+            <div class="receipt-header">
+                <h2>${settings.restaurantName || "RestoPOS"}</h2>
+                <p>${settings.address || ""}</p>
+                <p>Ph: ${settings.phone || ""}</p>
+                <p>GSTIN: ${settings.gstin || ""}</p>
+                <p style="margin-top:0.5rem;font-weight:bold">INVOICE: ${invoiceNo}</p>
+                <p>${dateStr}</p>
+            </div>
+            <div class="receipt-items">
+                <div class="receipt-row header">
+                    <span>Item</span>
+                    <span style="text-align:right">Qty</span>
+                    <span style="text-align:right">Amt</span>
+                </div>
+                ${cart.map(item => `
+                    <div class="receipt-row">
+                        <span>${item.name}</span>
+                        <span style="text-align:right">${item.qty}</span>
+                        <span style="text-align:right">${curr}${(item.price * item.qty).toFixed(2)}</span>
+                    </div>
+                `).join("")}
+                <div class="receipt-row" style="border-top:1px dashed #ccc;margin-top:0.5rem;padding-top:0.5rem">
+                    <span>Subtotal</span>
+                    <span></span>
+                    <span style="text-align:right">${curr}${(subtotal - gstAmount).toFixed(2)}</span>
+                </div>
+                <div class="receipt-row">
+                    <span>GST incl. (${gstRate}%)</span>
+                    <span></span>
+                    <span style="text-align:right">${curr}${gstAmount.toFixed(2)}</span>
+                </div>
+                ${discountRate > 0 ? `
+                <div class="receipt-row">
+                    <span>Discount (${discountRate}%)</span>
+                    <span></span>
+                    <span style="text-align:right">-${curr}${discountAmount.toFixed(2)}</span>
+                </div>
+                ` : ""}
+                <div class="receipt-row total">
+                    <span>GRAND TOTAL</span>
+                    <span></span>
+                    <span style="text-align:right">${curr}${grandTotal.toFixed(2)}</span>
+                </div>
+            </div>
+            <div class="receipt-footer">
+                <p>Thank you for dining with us!</p>
+                <p>Please visit again</p>
+            </div>
+        `;
+    }
+
+    openModal("receipt-modal");
+}
+
+function printReceipt() {
+    window.print();
+}
+
+function newOrder() {
+    cart = [];
+    selectedItemId = null;
+    saveToStorage(STORAGE_KEYS.CART, cart);
+    updateGlobalController();
+    renderMenu();
+    renderCart();
+    closeModal("receipt-modal");
+    showNotification("New order started", "success");
+}
+
+function openSettings() {
+    const s = settings || {};
+    const setVal = (id, val) => {
+        const el = els[id];
+        if (el) el.value = val || "";
+    };
+
+    setVal("setting-restaurant-name", s.restaurantName);
+    setVal("setting-address", s.address);
+    setVal("setting-phone", s.phone);
+    setVal("setting-gstin", s.gstin);
+    setVal("setting-logo", s.logo);
+    setVal("setting-gst-rate", s.gstRate);
+    setVal("setting-discount", s.discount);
+    setVal("setting-currency", s.currency);
+    setVal("setting-invoice-prefix", s.invoicePrefix);
+
+    const fontSlider = els["font-size-slider"];
+    const fontValue = els["font-size-value"];
+    const fontSize = s.fontSize || 14;
+    if (fontSlider) fontSlider.value = fontSize;
+    if (fontValue) fontValue.textContent = `${fontSize}px`;
+
+    renderSettingsMenuList();
+    openModal("settings-modal");
+}
+
+function saveSettings() {
+    const getVal = (id) => {
+        const el = els[id];
+        return el ? el.value : "";
+    };
+
+    settings.restaurantName = getVal("setting-restaurant-name") || "RestoPOS";
+    settings.address = getVal("setting-address") || "";
+    settings.phone = getVal("setting-phone") || "";
+    settings.gstin = getVal("setting-gstin") || "";
+    settings.logo = getVal("setting-logo") || "🍽️";
+    settings.gstRate = parseFloat(getVal("setting-gst-rate")) || 0;
+    settings.discount = parseFloat(getVal("setting-discount")) || 0;
+    settings.currency = getVal("setting-currency") || "₹";
+    settings.invoicePrefix = getVal("setting-invoice-prefix") || "INV-";
+    const fontSlider = els["font-size-slider"];
+    if (fontSlider) settings.fontSize = parseInt(fontSlider.value) || 14;
+
+    saveToStorage(STORAGE_KEYS.SETTINGS, settings);
+    applySettings();
+    renderCart();
+    closeModal("settings-modal");
+    showNotification("Settings saved", "success");
+}
+
+function resetSettings() {
+    if (!confirm("Reset all settings to default?")) return;
+    settings = JSON.parse(JSON.stringify(defaultSettings));
+    menu = JSON.parse(JSON.stringify(defaultMenu));
+    saveToStorage(STORAGE_KEYS.SETTINGS, settings);
+    saveToStorage(STORAGE_KEYS.MENU, menu);
+    applySettings();
+    renderMenu();
+    renderCart();
+    renderSettingsMenuList();
+    showNotification("Settings reset", "info");
+}
+
+function applyFontSize(size) {
+    let styleEl = document.getElementById("font-size-override");
+    if (!styleEl) {
+        styleEl = document.createElement("style");
+        styleEl.id = "font-size-override";
+        document.head.appendChild(styleEl);
+    }
+    styleEl.textContent = `html { font-size: ${size}px !important; }`;
+}
+
+function applySettings() {
+    if (!settings) return;
+
+    const nameEl = els["restaurant-name-display"];
+    const logoEl = els["logo-display"];
+
+    if (nameEl) nameEl.textContent = settings.restaurantName || "RestoPOS";
+    if (logoEl) logoEl.textContent = settings.logo || "🍽️";
+
+    document.documentElement.style.setProperty("--accent", settings.accentColor || "#ff6b35");
+    applyFontSize(settings.fontSize || 14);
+
+    const themeToggle = els["theme-toggle"];
+
+    if (settings.theme === "dark") {
+        document.documentElement.removeAttribute("data-theme");
+        if (themeToggle) themeToggle.textContent = "🌙";
+    } else if (settings.theme === "light") {
+        document.documentElement.setAttribute("data-theme", "light");
+        if (themeToggle) themeToggle.textContent = "☀️";
+    } else {
+        if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+            document.documentElement.removeAttribute("data-theme");
+            if (themeToggle) themeToggle.textContent = "🌙";
+        } else {
+            document.documentElement.setAttribute("data-theme", "light");
+            if (themeToggle) themeToggle.textContent = "☀️";
+        }
+    }
+}
+
+function toggleTheme() {
+    const current = document.documentElement.getAttribute("data-theme");
+    const themeToggle = els["theme-toggle"];
+
+    if (current === "light") {
+        settings.theme = "dark";
+        document.documentElement.removeAttribute("data-theme");
+        if (themeToggle) themeToggle.textContent = "🌙";
+    } else {
+        settings.theme = "light";
+        document.documentElement.setAttribute("data-theme", "light");
+        if (themeToggle) themeToggle.textContent = "☀️";
+    }
+    saveToStorage(STORAGE_KEYS.SETTINGS, settings);
+}
+
+function renderSettingsMenuList() {
+    const listEl = els["settings-menu-list"];
+    if (!listEl) return;
+
+    const curr = settings.currency || "₹";
+
+    listEl.innerHTML = menu.map(item => {
+        const imgDisplay = item.imageData 
+            ? `<img src="${item.imageData}" alt="">`
+            : `<div style="width:34px;height:34px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:1rem;background:var(--bg-tertiary)">${item.image || "🍽️"}</div>`;
+
+        return `
+            <div class="menu-list-item">
+                ${imgDisplay}
+                <div class="item-info">
+                    <div class="item-name">${item.name}</div>
+                    <div class="item-meta">${getCategoryName(item.category)} • ${curr}${item.price.toFixed(2)}</div>
+                </div>
+                <div class="item-actions">
+                    <button class="edit-btn" onclick="openEditItem(${item.id})">✏️</button>
+                    <button class="delete-btn" onclick="deleteMenuItem(${item.id})">🗑</button>
+                </div>
+            </div>
+        `;
+    }).join("");
+}
+
+function addMenuItem() {
+    const nameEl = els["new-item-name"];
+    const priceEl = els["new-item-price"];
+    const categoryEl = els["new-item-category"];
+    const fileInput = els["new-item-image"];
+
+    const name = nameEl ? nameEl.value.trim() : "";
+    const price = priceEl ? parseFloat(priceEl.value) : 0;
+    const category = categoryEl ? categoryEl.value : "burgers";
+
+    if (!name || !price || price <= 0) {
+        showNotification("Please enter valid name and price", "error");
+        return;
+    }
+
+    const newId = Math.max(...menu.map(m => m.id), 0) + 1;
+    const newItem = { id: newId, name, price, category, image: "🍽️" };
+
+    if (fileInput && fileInput.files && fileInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            newItem.imageData = e.target.result;
+            menu.push(newItem);
+            saveToStorage(STORAGE_KEYS.MENU, menu);
+            renderMenu();
+            renderSettingsMenuList();
+            if (nameEl) nameEl.value = "";
+            if (priceEl) priceEl.value = "";
+            fileInput.value = "";
+            showNotification("Item added", "success");
+        };
+        reader.readAsDataURL(fileInput.files[0]);
+    } else {
+        menu.push(newItem);
+        saveToStorage(STORAGE_KEYS.MENU, menu);
+        renderMenu();
+        renderSettingsMenuList();
+        if (nameEl) nameEl.value = "";
+        if (priceEl) priceEl.value = "";
+        showNotification("Item added", "success");
+    }
+}
+
+function openEditItem(id) {
+    const item = menu.find(m => m.id === id);
+    if (!item) return;
+
+    const idEl = els["edit-item-id"];
+    const nameEl = els["edit-item-name"];
+    const priceEl = els["edit-item-price"];
+    const categoryEl = els["edit-item-category"];
+    const imageEl = els["edit-item-image"];
+
+    if (idEl) idEl.value = id;
+    if (nameEl) nameEl.value = item.name;
+    if (priceEl) priceEl.value = item.price;
+    if (categoryEl) categoryEl.value = item.category;
+    if (imageEl) imageEl.value = "";
+
+    openModal("edit-item-modal");
+}
+
+function saveEditItem() {
+    const idEl = els["edit-item-id"];
+    const id = idEl ? parseInt(idEl.value) : 0;
+    const item = menu.find(m => m.id === id);
+    if (!item) return;
+
+    const nameEl = els["edit-item-name"];
+    const priceEl = els["edit-item-price"];
+    const categoryEl = els["edit-item-category"];
+    const fileInput = els["edit-item-image"];
+
+    item.name = nameEl ? nameEl.value.trim() : item.name;
+    item.price = priceEl ? (parseFloat(priceEl.value) || 0) : item.price;
+    item.category = categoryEl ? categoryEl.value : item.category;
+
+    if (fileInput && fileInput.files && fileInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            item.imageData = e.target.result;
+            finalizeEdit();
+        };
+        reader.readAsDataURL(fileInput.files[0]);
+    } else {
+        finalizeEdit();
+    }
+}
+
+function finalizeEdit() {
+    saveToStorage(STORAGE_KEYS.MENU, menu);
+    renderMenu();
+    renderSettingsMenuList();
+    renderCart();
+    closeModal("edit-item-modal");
+    showNotification("Item updated", "success");
+}
+
+function deleteMenuItem(id) {
+    if (!confirm("Delete this item permanently?")) return;
+    menu = menu.filter(m => m.id !== id);
+    cart = cart.filter(c => c.id !== id);
+    if (selectedItemId === id) selectedItemId = null;
+    saveToStorage(STORAGE_KEYS.MENU, menu);
+    saveToStorage(STORAGE_KEYS.CART, cart);
+    updateGlobalController();
+    renderMenu();
+    renderCart();
+    renderSettingsMenuList();
+    showNotification("Item deleted", "info");
+}
+
+function renderHistory() {
+    const listEl = els["history-list"];
+    if (!listEl) return;
+
+    if (orders.length === 0) {
+        listEl.innerHTML = `
+            <div class="empty-cart" style="padding: 3rem;">
+                <span style="font-size: 3rem;">📊</span>
+                <p>No sales yet</p>
+            </div>
+        `;
+        return;
+    }
+
+    const curr = settings.currency || "₹";
+
+    // Aggregate all items across all orders
+    const salesMap = {};
+    let grandTotal = 0;
+
+    orders.forEach(order => {
+        grandTotal += order.total || 0;
+        order.items.forEach(item => {
+            const key = item.name;
+            if (!salesMap[key]) {
+                salesMap[key] = { name: item.name, qty: 0, amount: 0 };
+            }
+            salesMap[key].qty += item.qty;
+            salesMap[key].amount += item.price * item.qty;
+        });
+    });
+
+    const rows = Object.values(salesMap).sort((a, b) => b.amount - a.amount);
+    const totalQty = rows.reduce((s, r) => s + r.qty, 0);
+
+    listEl.innerHTML = `
+        <div class="sales-summary-header">
+            <div class="sales-stat-box">
+                <span class="sales-stat-label">Total Orders</span>
+                <span class="sales-stat-value">${orders.length}</span>
+            </div>
+            <div class="sales-stat-box highlight">
+                <span class="sales-stat-label">Total Revenue</span>
+                <span class="sales-stat-value">${curr}${grandTotal.toFixed(2)}</span>
+            </div>
+        </div>
+        <table class="sales-table">
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th style="text-align:center">Qty Sold</th>
+                    <th style="text-align:right">Total Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${rows.map(row => `
+                    <tr>
+                        <td>${row.name}</td>
+                        <td style="text-align:center">${row.qty}</td>
+                        <td style="text-align:right;font-weight:700;color:var(--accent)">${curr}${row.amount.toFixed(2)}</td>
+                    </tr>
+                `).join("")}
+            </tbody>
+            <tfoot>
+                <tr class="sales-total-row">
+                    <td><strong>Grand Total</strong></td>
+                    <td style="text-align:center"><strong>${totalQty}</strong></td>
+                    <td style="text-align:right"><strong>${curr}${grandTotal.toFixed(2)}</strong></td>
+                </tr>
+            </tfoot>
+        </table>
+    `;
+}
+
+function viewHistoryOrder(id) {
+    const order = orders.find(o => o.id === id);
+    if (!order) return;
+
+    const date = new Date(order.date);
+    const dateStr = date.toLocaleString("en-IN", { 
+        day: "2-digit", month: "short", year: "numeric", 
+        hour: "2-digit", minute: "2-digit" 
+    });
+    const curr = settings.currency || "₹";
+
+    const receiptEl = els["receipt-content"];
+    if (receiptEl) {
+        receiptEl.innerHTML = `
+            <div class="receipt-header">
+                <h2>${settings.restaurantName || "RestoPOS"}</h2>
+                <p>${settings.address || ""}</p>
+                <p>Ph: ${settings.phone || ""}</p>
+                <p style="margin-top:0.5rem;font-weight:bold">INVOICE: ${order.id}</p>
+                <p>${dateStr}</p>
+                <p style="color:var(--success);margin-top:0.25rem">✅ PAID</p>
+            </div>
+            <div class="receipt-items">
+                <div class="receipt-row header">
+                    <span>Item</span>
+                    <span style="text-align:right">Qty</span>
+                    <span style="text-align:right">Amt</span>
+                </div>
+                ${order.items.map(item => `
+                    <div class="receipt-row">
+                        <span>${item.name}</span>
+                        <span style="text-align:right">${item.qty}</span>
+                        <span style="text-align:right">${curr}${(item.price * item.qty).toFixed(2)}</span>
+                    </div>
+                `).join("")}
+                <div class="receipt-row" style="border-top:1px dashed #ccc;margin-top:0.5rem;padding-top:0.5rem">
+                    <span>Subtotal</span>
+                    <span></span>
+                    <span style="text-align:right">${curr}${order.subtotal.toFixed(2)}</span>
+                </div>
+                <div class="receipt-row">
+                    <span>GST</span>
+                    <span></span>
+                    <span style="text-align:right">${curr}${order.gst.toFixed(2)}</span>
+                </div>
+                ${(order.discount || 0) > 0 ? `
+                <div class="receipt-row">
+                    <span>Discount</span>
+                    <span></span>
+                    <span style="text-align:right">-${curr}${order.discount.toFixed(2)}</span>
+                </div>
+                ` : ""}
+                <div class="receipt-row total">
+                    <span>GRAND TOTAL</span>
+                    <span></span>
+                    <span style="text-align:right">${curr}${order.total.toFixed(2)}</span>
+                </div>
+            </div>
+            <div class="receipt-footer">
+                <p>Thank you for dining with us!</p>
+            </div>
+        `;
+    }
+
+    closeModal("history-modal");
+    openModal("receipt-modal");
+}
+
+function openModal(id) {
+    const el = getEl(id);
+    if (el) el.classList.add("active");
+}
+
+function closeModal(id) {
+    const el = getEl(id);
+    if (el) el.classList.remove("active");
+}
+
+document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+        document.querySelectorAll(".modal.active").forEach(m => m.classList.remove("active"));
+    }
+    if (e.ctrlKey && e.key === "k") {
+        e.preventDefault();
+        const searchInput = els["search-input"];
+        if (searchInput) searchInput.focus();
+    }
+    if (e.ctrlKey && e.key === "s") {
+        e.preventDefault();
+        openSettings();
+    }
+    if (e.ctrlKey && e.key === "Enter") {
+        e.preventDefault();
+        checkout();
+    }
+    if (e.key === "+" || e.key === "=") {
+        e.preventDefault();
+        adjustSelected(1);
+    }
+    if (e.key === "-") {
+        e.preventDefault();
+        adjustSelected(-1);
+    }
+});
+
+function initEventListeners() {
+    const categoryList = els["category-list"];
+    if (categoryList) {
+        categoryList.addEventListener("click", (e) => {
+            if (e.target.classList.contains("category-btn")) {
+                document.querySelectorAll(".category-btn").forEach(b => b.classList.remove("active"));
+                e.target.classList.add("active");
+                currentCategory = e.target.dataset.category;
+                renderMenu();
+            }
+        });
+    }
+
+    const searchInput = els["search-input"];
+    if (searchInput) searchInput.addEventListener("input", renderMenu);
+
+    const clearBtn = els["clear-cart"];
+    if (clearBtn) clearBtn.addEventListener("click", clearCart);
+
+    const checkoutBtn = els["checkout-btn"];
+    if (checkoutBtn) checkoutBtn.addEventListener("click", checkout);
+
+    const settingsBtn = els["settings-btn"];
+    if (settingsBtn) settingsBtn.addEventListener("click", openSettings);
+
+    const closeSettings = els["close-settings"];
+    if (closeSettings) closeSettings.addEventListener("click", () => closeModal("settings-modal"));
+
+    const saveSettingsBtn = els["save-settings"];
+    if (saveSettingsBtn) saveSettingsBtn.addEventListener("click", saveSettings);
+
+    const resetSettingsBtn = els["reset-settings"];
+    if (resetSettingsBtn) resetSettingsBtn.addEventListener("click", resetSettings);
+
+    const closeReceipt = els["close-receipt"];
+    if (closeReceipt) closeReceipt.addEventListener("click", () => closeModal("receipt-modal"));
+
+    const printReceiptBtn = els["print-receipt-btn"];
+    if (printReceiptBtn) printReceiptBtn.addEventListener("click", printReceipt);
+
+    const newOrderBtn = els["new-order-btn"];
+    if (newOrderBtn) newOrderBtn.addEventListener("click", newOrder);
+
+    const historyBtn = els["history-btn"];
+    if (historyBtn) {
+        historyBtn.addEventListener("click", () => {
+            renderHistory();
+            openModal("history-modal");
+        });
+    }
+
+    const closeHistory = els["close-history"];
+    if (closeHistory) closeHistory.addEventListener("click", () => closeModal("history-modal"));
+
+    const themeToggle = els["theme-toggle"];
+    if (themeToggle) themeToggle.addEventListener("click", toggleTheme);
+
+    const addItemBtn = els["add-item-btn"];
+    if (addItemBtn) addItemBtn.addEventListener("click", addMenuItem);
+
+    const closeEdit = els["close-edit"];
+    if (closeEdit) closeEdit.addEventListener("click", () => closeModal("edit-item-modal"));
+
+    const cancelEdit = els["cancel-edit"];
+    if (cancelEdit) cancelEdit.addEventListener("click", () => closeModal("edit-item-modal"));
+
+    const saveEditBtn = els["save-edit-btn"];
+    if (saveEditBtn) saveEditBtn.addEventListener("click", saveEditItem);
+
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+            document.querySelectorAll(".tab-content").forEach(t => t.classList.remove("active"));
+            btn.classList.add("active");
+            const tabContent = getEl(`tab-${btn.dataset.tab}`);
+            if (tabContent) tabContent.classList.add("active");
+        });
+    });
+
+    document.querySelectorAll(".theme-option").forEach(btn => {
+        btn.addEventListener("click", () => {
+            document.querySelectorAll(".theme-option").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            settings.theme = btn.dataset.theme;
+        });
+    });
+
+    document.querySelectorAll(".color-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            document.querySelectorAll(".color-btn").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            settings.accentColor = btn.dataset.color;
+            document.documentElement.style.setProperty("--accent", settings.accentColor);
+        });
+    });
+
+    const fontSlider = els["font-size-slider"];
+    const fontValue = els["font-size-value"];
+    if (fontSlider && fontValue) {
+        fontSlider.addEventListener("input", (e) => {
+            const size = parseInt(e.target.value);
+            settings.fontSize = size;
+            fontValue.textContent = `${size}px`;
+            applyFontSize(size);
+        });
+    }
+
+    document.querySelectorAll(".modal-overlay").forEach(overlay => {
+        overlay.addEventListener("click", () => {
+            if (overlay.parentElement) overlay.parentElement.classList.remove("active");
+        });
+    });
+}
+
+function confirmExit() {
+    if (confirm('Are you sure you want to exit HBILLSOFT?')) {
+        if (window.pywebview) {
+            window.pywebview.api.close_window();
+        } else {
+            window.close();
+        }
+    }
+}
+
+function init() {
+    try {
+        cacheElements();
+        initStorage();
+        initEventListeners();
+        applySettings();
+        updateGlobalController();
+        renderMenu();
+        renderCart();
+    } catch (err) {
+        console.error("Init error:", err);
+    } finally {
+        hideLoadingScreen();
+    }
+}
+
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+} else {
+    init();
+}
+</script>
+</body>
+</html>

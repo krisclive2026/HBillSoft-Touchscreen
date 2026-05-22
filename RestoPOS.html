@@ -1959,13 +1959,7 @@
             <aside class="categories-sidebar">
                 <h3>Categories</h3>
                 <nav class="category-list" id="category-list">
-                    <button class="category-btn active" data-category="all">📋 All Items</button>
-                    <button class="category-btn" data-category="burgers">🍔 Burgers</button>
-                    <button class="category-btn" data-category="pizza">🍕 Pizza</button>
-                    <button class="category-btn" data-category="drinks">🥤 Drinks</button>
-                    <button class="category-btn" data-category="desserts">🍰 Desserts</button>
-                    <button class="category-btn" data-category="south-indian">🍛 South Indian</button>
-                    <button class="category-btn" data-category="north-indian">🥘 North Indian</button>
+                    <!-- rendered dynamically by renderCategorySidebar() -->
                 </nav>
             </aside>
 
@@ -2091,12 +2085,7 @@
                                 <div class="form-group">
                                     <label>Category</label>
                                     <select id="new-item-category">
-                                        <option value="burgers">Burgers</option>
-                                        <option value="pizza">Pizza</option>
-                                        <option value="drinks">Drinks</option>
-                                        <option value="desserts">Desserts</option>
-                                        <option value="south-indian">South Indian</option>
-                                        <option value="north-indian">North Indian</option>
+                                        <!-- populated by populateCategoryDropdowns() -->
                                     </select>
                                 </div>
                                 <div class="form-group">
@@ -2107,6 +2096,13 @@
                             <button class="btn primary" id="add-item-btn">➕ Add Item</button>
                         </div>
                         <div class="menu-list-container">
+                            <h4 style="margin-bottom:0.5rem;">Categories</h4>
+                            <div style="display:flex;gap:8px;margin-bottom:0.5rem;">
+                                <input type="text" id="new-category-name" placeholder="Category name" style="flex:1;padding:6px 10px;border-radius:6px;border:1px solid var(--border);background:var(--bg-primary);color:var(--text-primary);font-size:0.9rem;">
+                                <input type="text" id="new-category-icon" placeholder="Icon e.g. 🍜" style="width:80px;padding:6px 10px;border-radius:6px;border:1px solid var(--border);background:var(--bg-primary);color:var(--text-primary);font-size:0.9rem;">
+                                <button class="btn primary" onclick="addCategory()" style="padding:6px 14px;white-space:nowrap;">➕ Add</button>
+                            </div>
+                            <div id="category-manager-list" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:1rem;"></div>
                             <h4>Current Menu Items</h4>
                             <div class="menu-list" id="settings-menu-list"></div>
                         </div>
@@ -2242,12 +2238,7 @@
                     <div class="form-group">
                         <label>Category</label>
                         <select id="edit-item-category">
-                            <option value="burgers">Burgers</option>
-                            <option value="pizza">Pizza</option>
-                            <option value="drinks">Drinks</option>
-                            <option value="desserts">Desserts</option>
-                            <option value="south-indian">South Indian</option>
-                            <option value="north-indian">North Indian</option>
+                            <!-- populated by populateCategoryDropdowns() -->
                         </select>
                     </div>
                     <div class="form-group">
@@ -2324,8 +2315,93 @@
             MENU: "pos_menu",
             CART: "pos_cart",
             SETTINGS: "pos_settings",
-            ORDERS: "pos_orders"
+            ORDERS: "pos_orders",
+            CATEGORIES: "pos_categories"
         };
+
+        const DEFAULT_CATEGORIES = [
+            { id: "burgers",      name: "Burgers",      icon: "🍔" },
+            { id: "pizza",        name: "Pizza",         icon: "🍕" },
+            { id: "drinks",       name: "Drinks",        icon: "🥤" },
+            { id: "desserts",     name: "Desserts",      icon: "🍰" },
+            { id: "south-indian", name: "South Indian",  icon: "🍛" },
+            { id: "north-indian", name: "North Indian",  icon: "🥘" },
+        ];
+
+        let categories = loadFromStorage(STORAGE_KEYS.CATEGORIES, null) || DEFAULT_CATEGORIES;
+
+        function saveCategories() {
+            saveToStorage(STORAGE_KEYS.CATEGORIES, categories);
+        }
+
+        function addCategory() {
+            const nameEl = document.getElementById("new-category-name");
+            const iconEl = document.getElementById("new-category-icon");
+            const name = (nameEl ? nameEl.value.trim() : "");
+            const icon = (iconEl ? iconEl.value.trim() : "") || "🍽️";
+            if (!name) { showNotification("Enter a category name", "warning"); return; }
+            const id = name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+            if (categories.find(c => c.id === id)) { showNotification("Category already exists", "warning"); return; }
+            categories.push({ id, name, icon });
+            saveCategories();
+            if (nameEl) nameEl.value = "";
+            if (iconEl) iconEl.value = "";
+            renderCategoryManagerList();
+            renderCategorySidebar();
+            populateCategoryDropdowns();
+        }
+
+        function deleteCategory(id) {
+            const hasItems = menu.some(item => item.category === id);
+            if (hasItems) {
+                showNotification("Cannot delete — category has menu items. Remove or reassign them first.", "warning");
+                return;
+            }
+            categories = categories.filter(c => c.id !== id);
+            saveCategories();
+            renderCategoryManagerList();
+            renderCategorySidebar();
+            populateCategoryDropdowns();
+        }
+
+        function renderCategoryManagerList() {
+            const el = document.getElementById("category-manager-list");
+            if (!el) return;
+            el.innerHTML = categories.map(cat => `
+                <div style="display:flex;align-items:center;gap:6px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:8px;padding:4px 10px;">
+                    <span>${cat.icon}</span>
+                    <span style="font-size:0.9rem;">${cat.name}</span>
+                    <button onclick="deleteCategory('${cat.id}')" title="Delete category"
+                        style="background:none;border:none;color:#e74c3c;font-size:1rem;cursor:pointer;margin-left:4px;line-height:1;">✕</button>
+                </div>
+            `).join("");
+        }
+
+        function renderCategorySidebar() {
+            const nav = document.getElementById("category-list");
+            if (!nav) return;
+            nav.innerHTML = `<button class="category-btn ${currentCategory === 'all' ? 'active' : ''}" data-category="all" onclick="filterByCategory('all')">📋 All Items</button>` +
+                categories.map(cat =>
+                    `<button class="category-btn ${currentCategory === cat.id ? 'active' : ''}" data-category="${cat.id}" onclick="filterByCategory('${cat.id}')">${cat.icon} ${cat.name}</button>`
+                ).join("");
+        }
+
+        function populateCategoryDropdowns() {
+            ["new-item-category", "edit-item-category"].forEach(id => {
+                const sel = document.getElementById(id);
+                if (!sel) return;
+                const current = sel.value;
+                sel.innerHTML = categories.map(cat =>
+                    `<option value="${cat.id}" ${cat.id === current ? "selected" : ""}>${cat.name}</option>`
+                ).join("");
+            });
+        }
+
+        function getCategoryName(cat) {
+            if (cat === "all") return "All Items";
+            const found = categories.find(c => c.id === cat);
+            return found ? found.name : cat;
+        }
 
         function loadFromStorage(key, defaultValue) {
             try {
@@ -2502,6 +2578,9 @@
             }
 
             updateGlobalController();
+            renderCategorySidebar();
+            populateCategoryDropdowns();
+            renderCategoryManagerList();
             renderMenu();
             renderCart();
         }
@@ -2552,17 +2631,12 @@
             plusBtn.disabled = false;
         }
 
-        function getCategoryName(cat) {
-            const names = {
-                all: "All Items",
-                burgers: "Burgers",
-                pizza: "Pizza",
-                drinks: "Drinks",
-                desserts: "Desserts",
-                "south-indian": "South Indian",
-                "north-indian": "North Indian"
-            };
-            return names[cat] || cat;
+
+
+        function filterByCategory(category) {
+            currentCategory = category;
+            renderCategorySidebar();
+            renderMenu();
         }
 
         function renderMenu() {
@@ -2934,6 +3008,8 @@
 
             renderSettingsMenuList();
             openModal("settings-modal");
+            renderCategoryManagerList();
+            populateCategoryDropdowns();
         }
 
         function saveSettings() {
@@ -3662,6 +3738,8 @@
                 applySettings();
                 updateGlobalController();
                 updateFooter();
+                renderCategorySidebar();
+                populateCategoryDropdowns();
                 renderMenu();
                 renderCart();
             } catch (err) {

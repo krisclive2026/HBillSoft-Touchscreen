@@ -31,17 +31,32 @@ def resource_path(filename):
     return os.path.join(os.path.dirname(os.path.abspath(__file__)), filename)
 
 # ── Hidden data folder (sits next to the app, invisible in file explorer) ──────
-_APP_DIR     = os.path.dirname(os.path.abspath(__file__))
+if hasattr(sys, '_MEIPASS'):
+    # Running as EXE — use the folder where the EXE sits, not the temp extract folder
+    _APP_DIR = os.path.dirname(sys.executable)
+else:
+    # Running as plain .py script
+    _APP_DIR = os.path.dirname(os.path.abspath(__file__))
 _DATA_DIR    = os.path.join(_APP_DIR, '.hbillsoft')
-os.makedirs(_DATA_DIR, exist_ok=True)
+
+print(f"[DEBUG] App directory   : {_APP_DIR}")
+print(f"[DEBUG] Data directory  : {_DATA_DIR}")
+
+try:
+    os.makedirs(_DATA_DIR, exist_ok=True)
+    print(f"[DEBUG] .hbillsoft folder OK: {_DATA_DIR}")
+except Exception as e:
+    print(f"[ERROR] Could not create data folder: {e}")
+    sys.exit(1)
 
 # On Windows, mark the folder as hidden via attrib
 if platform.system() == 'Windows':
     try:
         import subprocess
         subprocess.call(['attrib', '+H', _DATA_DIR], shell=False)
-    except Exception:
-        pass
+        print(f"[DEBUG] Folder marked as hidden (Windows)")
+    except Exception as e:
+        print(f"[WARN] Could not hide folder: {e}")
 
 def data_path(filename):
     """Resolve a data file into the hidden .hbillsoft folder."""
@@ -1502,6 +1517,9 @@ config['sessionCount'] = config.get('sessionCount', 0) + 1
 save_config_to_file(config)
 
 html_file = resource_path('RestoPOS.html')
+print(f"[DEBUG] HTML file path  : {html_file}")
+print(f"[DEBUG] HTML file exists: {os.path.exists(html_file)}")
+print(f"[DEBUG] Launching webview window...")
 
 window = webview.create_window(
     title='HBILLSOFT',

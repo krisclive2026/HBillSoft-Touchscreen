@@ -795,6 +795,10 @@
             justify-content: center;
             padding: 1rem 0.75rem;
             gap: 1.5rem;
+            position: sticky;
+            top: 0;
+            height: 100%;
+            overflow: hidden;
         }
 
         .mega-qty-btn {
@@ -857,6 +861,7 @@
             display: flex;
             flex-direction: column;
             height: 100%;
+            overflow: hidden;
         }
 
         .cart-header {
@@ -891,8 +896,25 @@
         /* ===== CART ITEMS ===== */
         .cart-items {
             flex: 1;
-            overflow-y: auto;
+            overflow-y: scroll;
             padding: 0.5rem 0.875rem 0.5rem;
+            min-height: 0;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent) transparent;
+        }
+
+        .cart-items::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .cart-items::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .cart-items::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 3px;
+            opacity: 0.7;
         }
 
         .empty-cart {
@@ -1002,6 +1024,47 @@
         .remove-btn:hover {
             background: var(--danger);
             color: white;
+        }
+
+        .cart-item-discounted {
+            font-size: 0.72rem;
+            color: var(--success);
+            text-decoration: line-through;
+            text-decoration-color: var(--danger);
+        }
+
+        /* Common discount row in cart footer */
+        .common-discount-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.35rem 0;
+            gap: 0.5rem;
+        }
+
+        .common-discount-row label {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            white-space: nowrap;
+        }
+
+        .common-discount-input {
+            width: 72px;
+            padding: 3px 7px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--bg-primary);
+            color: var(--success);
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-align: center;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .common-discount-input:focus {
+            border-color: var(--success);
+            box-shadow: 0 0 0 2px rgba(0, 212, 170, 0.15);
         }
 
         /* ===== CART FOOTER ===== */
@@ -1835,6 +1898,182 @@
             border-top: 2px solid var(--accent);
             color: var(--text-primary);
         }
+        /* ===== NAV TAB BUTTONS ===== */
+        .nav-tab-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 13px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+        .nav-tab-btn:hover {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+        }
+        .nav-tab-btn.active {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+        }
+        /* ===== MENU MANAGER PAGE ===== */
+        #menu-manager-page {
+            display: none;
+            height: calc(100vh - 96px);
+            overflow-y: auto;
+            background: var(--bg-primary);
+            padding: 1.5rem 2rem;
+        }
+        #menu-manager-page.active {
+            display: block;
+        }
+        .mm-page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .mm-page-header h1 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+        .mm-page-header h1 span { color: var(--accent); }
+        .mm-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+        @media (max-width: 900px) { .mm-grid { grid-template-columns: 1fr; } }
+        .mm-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.25rem;
+        }
+        .mm-card h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .mm-card h3 .badge {
+            background: var(--accent-light);
+            color: var(--accent);
+            font-size: 0.7rem;
+            font-weight: 700;
+            border-radius: 20px;
+            padding: 2px 8px;
+        }
+        .mm-full-width { grid-column: 1 / -1; }
+        .mm-stats-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .mm-stat-chip {
+            flex: 1;
+            min-width: 120px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 0.9rem 1.1rem;
+            text-align: center;
+        }
+        .mm-stat-chip .stat-num {
+            font-size: 1.7rem;
+            font-weight: 900;
+            color: var(--accent);
+            line-height: 1;
+        }
+        .mm-stat-chip .stat-label {
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .mm-items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 0.9rem;
+            max-height: 480px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+        .mm-item-card {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: var(--transition);
+        }
+        .mm-item-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        .mm-item-thumb {
+            width: 44px; height: 44px;
+            border-radius: 8px;
+            flex-shrink: 0;
+            background: var(--bg-secondary);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem; overflow: hidden;
+        }
+        .mm-item-thumb img { width: 44px; height: 44px; border-radius: 8px; object-fit: cover; }
+        .mm-item-info { flex: 1; min-width: 0; }
+        .mm-item-info .name {
+            font-weight: 700; font-size: 0.88rem; color: var(--text-primary);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .mm-item-info .price { font-size: 0.82rem; color: var(--accent); font-weight: 600; margin-top: 2px; }
+        .mm-item-actions { display: flex; gap: 4px; flex-direction: column; }
+        .mm-item-actions button {
+            width: 26px; height: 26px; border-radius: 6px;
+            border: 1px solid var(--border); background: var(--bg-secondary);
+            color: var(--text-secondary); cursor: pointer; font-size: 0.75rem;
+            display: flex; align-items: center; justify-content: center;
+            transition: var(--transition);
+        }
+        .mm-item-actions button:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+        .mm-item-actions button.del:hover { background: #ff3366; border-color: #ff3366; }
+        .mm-cat-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1rem; }
+        .mm-cat-chip {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: var(--bg-tertiary); border: 1px solid var(--border);
+            border-radius: 20px; padding: 5px 12px;
+            font-size: 0.82rem; font-weight: 600; color: var(--text-primary);
+        }
+        .mm-cat-chip .del-cat {
+            cursor: pointer; color: var(--text-secondary); font-size: 0.8rem;
+            line-height: 1; padding: 0 2px; border-radius: 50%; transition: var(--transition);
+        }
+        .mm-cat-chip .del-cat:hover { color: #ff3366; }
+        .mm-filter-bar { display: flex; gap: 8px; margin-bottom: 1rem; flex-wrap: wrap; }
+        .mm-filter-bar input, .mm-filter-bar select {
+            flex: 1; min-width: 120px; padding: 7px 11px;
+            border-radius: var(--radius-sm); border: 1px solid var(--border);
+            background: var(--bg-tertiary); color: var(--text-primary); font-size: 0.85rem; outline: none;
+        }
+        .mm-filter-bar input:focus, .mm-filter-bar select:focus { border-color: var(--accent); }
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
@@ -1948,6 +2187,8 @@
             </div>
             <div class="header-right">
                 <button class="icon-btn" id="theme-toggle" title="Toggle Theme">🌙</button>
+                <button class="nav-tab-btn active" id="pos-view-btn" title="POS" onclick="switchView('pos')">🛒 POS</button>
+                <button class="nav-tab-btn" id="menu-view-btn" title="Menu Manager" onclick="switchView('menu-manager')">🍽️ Menu</button>
                 <button class="icon-btn" id="settings-btn" title="Settings">⚙️</button>
                 <button class="icon-btn" id="history-btn" title="Sales Summary">📊</button>
                 <button class="icon-btn" id="exit-btn" title="Exit" onclick="confirmExit()"
@@ -2008,6 +2249,14 @@
                             <span>CGST incl. (<span id="cgst-rate">2.5</span>%)</span>
                             <span id="cgst-amount">₹0.00</span>
                         </div>
+                        <div class="common-discount-row">
+                            <label>Discount %</label>
+                            <input type="number" class="common-discount-input" id="cart-discount-input"
+                                min="0" max="100" step="0.5" value="0"
+                                placeholder="0"
+                                oninput="setCartDiscount(this.value)"
+                                onchange="setCartDiscount(this.value)">
+                        </div>
                         <div class="bill-row discount-row hidden" id="discount-row">
                             <span>Discount</span>
                             <span id="discount-amount">-₹0.00</span>
@@ -2023,6 +2272,96 @@
                     </button>
                 </div>
             </aside>
+        </div>
+
+        <!-- ===== MENU MANAGER PAGE ===== -->
+        <div id="menu-manager-page">
+            <div class="mm-page-header">
+                <h1>🍽️ Menu <span>Manager</span></h1>
+                <button class="btn primary" onclick="switchView('pos')" style="padding:6px 16px;font-size:0.85rem;">← Back to POS</button>
+            </div>
+
+            <!-- Stats Row -->
+            <div class="mm-stats-row">
+                <div class="mm-stat-chip">
+                    <div class="stat-num" id="mm-stat-items">0</div>
+                    <div class="stat-label">Menu Items</div>
+                </div>
+                <div class="mm-stat-chip">
+                    <div class="stat-num" id="mm-stat-cats">0</div>
+                    <div class="stat-label">Categories</div>
+                </div>
+                <div class="mm-stat-chip">
+                    <div class="stat-num" id="mm-stat-avgprice">0</div>
+                    <div class="stat-label">Avg Price</div>
+                </div>
+                <div class="mm-stat-chip">
+                    <div class="stat-num" id="mm-stat-highest">0</div>
+                    <div class="stat-label">Highest Price</div>
+                </div>
+            </div>
+
+            <div class="mm-grid">
+                <!-- Add Item Card -->
+                <div class="mm-card">
+                    <h3>➕ Add New Item</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Item Name</label>
+                            <input type="text" id="mm-new-item-name" placeholder="e.g. Chicken Burger">
+                        </div>
+                        <div class="form-group">
+                            <label>Price (₹)</label>
+                            <input type="number" id="mm-new-item-price" placeholder="0.00" min="0" step="0.01">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Category</label>
+                            <select id="mm-new-item-category">
+                                <!-- populated dynamically -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Image</label>
+                            <input type="file" id="mm-new-item-image" accept="image/*">
+                        </div>
+                    </div>
+                    <button class="btn primary" id="mm-add-item-btn" style="width:100%;margin-top:0.5rem;" onclick="mmAddMenuItem()">➕ Add Menu Item</button>
+                </div>
+
+                <!-- Category Manager Card -->
+                <div class="mm-card">
+                    <h3>📂 Categories <span class="badge" id="mm-cat-count-badge">0</span></h3>
+                    <div style="display:flex;gap:8px;margin-bottom:0.85rem;">
+                        <input type="text" id="mm-new-category-name" placeholder="Category name" style="flex:1;padding:7px 11px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg-tertiary);color:var(--text-primary);font-size:0.85rem;outline:none;">
+                        <input type="text" id="mm-new-category-icon" placeholder="🍜" style="width:60px;padding:7px 10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg-tertiary);color:var(--text-primary);font-size:0.85rem;outline:none;text-align:center;">
+                        <button class="btn primary" onclick="mmAddCategory()" style="padding:7px 14px;white-space:nowrap;">➕ Add</button>
+                    </div>
+                    <div class="mm-cat-chips" id="mm-category-chips"></div>
+                </div>
+
+                <!-- Menu Items Browser (full width) -->
+                <div class="mm-card mm-full-width">
+                    <h3>📋 All Menu Items <span class="badge" id="mm-items-count-badge">0</span></h3>
+                    <div class="mm-filter-bar">
+                        <input type="text" id="mm-search" placeholder="🔍 Search items..." oninput="renderMMItemsGrid()">
+                        <select id="mm-filter-cat" onchange="renderMMItemsGrid()">
+                            <option value="all">All Categories</option>
+                        </select>
+                        <select id="mm-sort" onchange="renderMMItemsGrid()">
+                            <option value="name">Sort: Name A-Z</option>
+                            <option value="name-desc">Sort: Name Z-A</option>
+                            <option value="price-asc">Sort: Price Low-High</option>
+                            <option value="price-desc">Sort: Price High-Low</option>
+                            <option value="cat">Sort: Category</option>
+                        </select>
+                    </div>
+                    <div class="mm-items-grid" id="mm-items-grid">
+                        <!-- rendered dynamically -->
+                    </div>
+                </div>
+            </div>
         </div>
 
         <footer class="app-footer">
@@ -2045,7 +2384,6 @@
                 <div class="modal-body">
                     <div class="settings-tabs">
                         <button class="tab-btn active" data-tab="general">General</button>
-                        <button class="tab-btn" data-tab="menu">Menu Manager</button>
                         <button class="tab-btn" data-tab="tax">Tax & Billing</button>
                         <button class="tab-btn" data-tab="appearance">Appearance</button>
                     </div>
@@ -2066,45 +2404,6 @@
                         <div class="form-group">
                             <label>GST Number</label>
                             <input type="text" id="setting-gstin" placeholder="GSTIN">
-                        </div>
-                    </div>
-
-                    <div class="tab-content" id="tab-menu">
-                        <div class="menu-manager">
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label>Item Name</label>
-                                    <input type="text" id="new-item-name" placeholder="Item name">
-                                </div>
-                                <div class="form-group">
-                                    <label>Price (₹)</label>
-                                    <input type="number" id="new-item-price" placeholder="0.00" min="0" step="0.01">
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label>Category</label>
-                                    <select id="new-item-category">
-                                        <!-- populated by populateCategoryDropdowns() -->
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label>Image</label>
-                                    <input type="file" id="new-item-image" accept="image/*">
-                                </div>
-                            </div>
-                            <button class="btn primary" id="add-item-btn">➕ Add Item</button>
-                        </div>
-                        <div class="menu-list-container">
-                            <h4 style="margin-bottom:0.5rem;">Categories</h4>
-                            <div style="display:flex;gap:8px;margin-bottom:0.5rem;">
-                                <input type="text" id="new-category-name" placeholder="Category name" style="flex:1;padding:6px 10px;border-radius:6px;border:1px solid var(--border);background:var(--bg-primary);color:var(--text-primary);font-size:0.9rem;">
-                                <input type="text" id="new-category-icon" placeholder="Icon e.g. 🍜" style="width:80px;padding:6px 10px;border-radius:6px;border:1px solid var(--border);background:var(--bg-primary);color:var(--text-primary);font-size:0.9rem;">
-                                <button class="btn primary" onclick="addCategory()" style="padding:6px 14px;white-space:nowrap;">➕ Add</button>
-                            </div>
-                            <div id="category-manager-list" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:1rem;"></div>
-                            <h4>Current Menu Items</h4>
-                            <div class="menu-list" id="settings-menu-list"></div>
                         </div>
                     </div>
 
@@ -2310,14 +2609,15 @@
         let orders = [];
         let currentCategory = "all";
         let selectedItemId = null;
+        let cartDiscount = 0; // Common cart-level discount %
+        let lastInvoiceNo = ""; // Saved for printReceipt()
 
-        const STORAGE_KEYS = {
-            MENU: "pos_menu",
-            CART: "pos_cart",
-            SETTINGS: "pos_settings",
-            ORDERS: "pos_orders",
-            CATEGORIES: "pos_categories"
-        };
+        function setCartDiscount(value) {
+            cartDiscount = Math.min(100, Math.max(0, parseFloat(value) || 0));
+            const inputEl = document.getElementById('cart-discount-input');
+            if (inputEl && parseFloat(inputEl.value) !== cartDiscount) inputEl.value = cartDiscount;
+            renderCartTotals();
+        }
 
         const DEFAULT_CATEGORIES = [
             { id: "burgers",      name: "Burgers",      icon: "🍔" },
@@ -2328,10 +2628,41 @@
             { id: "north-indian", name: "North Indian",  icon: "🥘" },
         ];
 
-        let categories = loadFromStorage(STORAGE_KEYS.CATEGORIES, null) || DEFAULT_CATEGORIES;
+        let categories = [...DEFAULT_CATEGORIES];
 
-        function saveCategories() {
-            saveToStorage(STORAGE_KEYS.CATEGORIES, categories);
+        // ── SQLite-only persistence helpers ─────────────────────────────────
+        const db = {
+            async saveCategories(cats) {
+                if (!window.pywebview?.api) return;
+                try { await window.pywebview.api.save_categories(cats); }
+                catch(e) { console.warn("save_categories error:", e); }
+            },
+            async saveMenu(m) {
+                if (!window.pywebview?.api) return;
+                try { await window.pywebview.api.save_menu(m); }
+                catch(e) { console.warn("save_menu error:", e); }
+            },
+            async saveSettings(s) {
+                if (!window.pywebview?.api) return;
+                try { await window.pywebview.api.save_settings(s); }
+                catch(e) { console.warn("save_settings error:", e); }
+            },
+            async saveCart(c) {
+                if (!window.pywebview?.api) return;
+                try { await window.pywebview.api.save_cart(c); }
+                catch(e) { console.warn("save_cart error:", e); }
+            }
+        };
+
+        function saveCategories() { db.saveCategories(categories); }
+
+        function saveMenu() { db.saveMenu(menu); }
+
+        function saveCart() { db.saveCart(cart); }
+
+        async function saveToConfig(data) {
+            settings = { ...settings, ...data };
+            await db.saveSettings(settings);
         }
 
         function addCategory() {
@@ -2352,16 +2683,36 @@
         }
 
         function deleteCategory(id) {
-            const hasItems = menu.some(item => item.category === id);
+            const cat = categories.find(c => c.id === id);
+            const catName = cat ? cat.name : id;
+            const itemsInCat = menu.filter(item => item.category === id);
+            const hasItems = itemsInCat.length > 0;
+
             if (hasItems) {
-                showNotification("Cannot delete — category has menu items. Remove or reassign them first.", "warning");
-                return;
+                const choice = confirm(
+                    `"${catName}" has ${itemsInCat.length} item(s).\n\nClick OK to delete the category AND all its items.\nClick Cancel to keep the category.`
+                );
+                if (!choice) return;
+                // Delete all items in this category
+                menu = menu.filter(item => item.category !== id);
+                cart = cart.filter(c => {
+                    const m = menu.find(m => m.id === c.id);
+                    return !!m;
+                });
+                saveMenu();
+                saveCart();
+                updateGlobalController();
+                renderMenu();
+                renderCart();
             }
+
             categories = categories.filter(c => c.id !== id);
             saveCategories();
             renderCategoryManagerList();
             renderCategorySidebar();
             populateCategoryDropdowns();
+            renderSettingsMenuList();
+            showNotification(`Category "${catName}" deleted`, "info");
         }
 
         function renderCategoryManagerList() {
@@ -2403,80 +2754,75 @@
             return found ? found.name : cat;
         }
 
-        function loadFromStorage(key, defaultValue) {
-            try {
-                const data = localStorage.getItem(key);
-                return data ? JSON.parse(data) : defaultValue;
-            } catch {
-                return defaultValue;
-            }
-        }
-
-        function saveToStorage(key, data) {
-            try {
-                localStorage.setItem(key, JSON.stringify(data));
-            } catch (e) {
-                console.warn("Storage error:", e);
-            }
-        }
-
-        async function saveToConfig(data) {
-            if (window.pywebview && window.pywebview.api) {
-                try {
-                    await window.pywebview.api.save_config(data);
-                } catch (e) {
-                    console.error("Config save error:", e);
-                }
-            }
-            saveToStorage(STORAGE_KEYS.SETTINGS, data);
-        }
-
         async function initStorage() {
-            menu = loadFromStorage(STORAGE_KEYS.MENU, null);
-            if (!menu || !Array.isArray(menu) || menu.length === 0) {
-                menu = JSON.parse(JSON.stringify(defaultMenu));
-                saveToStorage(STORAGE_KEYS.MENU, menu);
-            }
-            cart = loadFromStorage(STORAGE_KEYS.CART, []);
-            if (!Array.isArray(cart)) cart = [];
+            const api = window.pywebview?.api;
 
-            settings = null;
-            if (window.pywebview && window.pywebview.api) {
+            // ── Categories ───────────────────────────────────────────────────
+            if (api) {
                 try {
-                    const pyConfig = await window.pywebview.api.load_config();
-                    if (pyConfig && Object.keys(pyConfig).length > 0) {
-                        settings = pyConfig;
+                    const r = await api.load_categories();
+                    if (r?.ok && Array.isArray(r.categories) && r.categories.length > 0) {
+                        categories = r.categories;
+                    } else {
+                        // First run: seed with defaults
+                        await api.save_categories(categories);
                     }
-                } catch (e) {
-                    console.warn("Config load error:", e);
-                }
+                } catch(e) { console.warn("load_categories:", e); }
             }
 
-            if (!settings || typeof settings !== "object" || Object.keys(settings).length === 0) {
-                settings = loadFromStorage(STORAGE_KEYS.SETTINGS, null);
+            // ── Menu ─────────────────────────────────────────────────────────
+            if (api) {
+                try {
+                    const r = await api.load_menu();
+                    if (r?.ok && Array.isArray(r.menu) && r.menu.length > 0) {
+                        menu = r.menu;
+                    } else {
+                        menu = JSON.parse(JSON.stringify(defaultMenu));
+                        await api.save_menu(menu);
+                    }
+                } catch(e) {
+                    console.warn("load_menu:", e);
+                    menu = JSON.parse(JSON.stringify(defaultMenu));
+                }
+            } else {
+                menu = JSON.parse(JSON.stringify(defaultMenu));
             }
-            if (!settings || typeof settings !== "object" || Object.keys(settings).length === 0) {
+
+            // ── Settings ─────────────────────────────────────────────────────
+            if (api) {
+                try {
+                    const r = await api.load_settings();
+                    if (r?.ok && r.settings && Object.keys(r.settings).length > 0) {
+                        settings = { ...JSON.parse(JSON.stringify(defaultSettings)), ...r.settings };
+                    } else {
+                        settings = JSON.parse(JSON.stringify(defaultSettings));
+                        await api.save_settings(settings);
+                    }
+                } catch(e) {
+                    console.warn("load_settings:", e);
+                    settings = JSON.parse(JSON.stringify(defaultSettings));
+                }
+            } else {
                 settings = JSON.parse(JSON.stringify(defaultSettings));
             }
 
-            // ── Load orders from SQLite database ────────────────────────────
-            orders = [];
-            if (window.pywebview && window.pywebview.api) {
+            // ── Cart ─────────────────────────────────────────────────────────
+            cart = [];
+            if (api) {
                 try {
-                    const result = await window.pywebview.api.load_orders();
-                    if (result && result.ok && Array.isArray(result.orders)) {
-                        orders = result.orders;
-                    }
-                } catch (e) {
-                    console.warn("SQLite orders load error:", e);
-                }
+                    const r = await api.load_cart();
+                    if (r?.ok && Array.isArray(r.cart)) cart = r.cart;
+                } catch(e) { console.warn("load_cart:", e); }
             }
-            
-            // Fallback to localStorage if SQLite failed
-            if (orders.length === 0) {
-                orders = loadFromStorage(STORAGE_KEYS.ORDERS, []);
+
+            // ── Orders ───────────────────────────────────────────────────────
+            orders = [];
+            if (api) {
+                try {
+                    const r = await api.load_orders();
+                    if (r?.ok && Array.isArray(r.orders)) orders = r.orders;
+                } catch(e) { console.warn("load_orders:", e); }
             }
-            if (!Array.isArray(orders)) orders = [];
         }
 
         function getEl(id) { return document.getElementById(id); }
@@ -2496,12 +2842,11 @@
                 "edit-item-modal", "settings-btn", "close-settings", "save-settings",
                 "reset-settings", "clear-cart", "checkout-btn", "close-receipt",
                 "print-receipt-btn", "new-order-btn", "history-btn", "close-history",
-                "theme-toggle", "add-item-btn", "close-edit", "cancel-edit",
+                "theme-toggle", "close-edit", "cancel-edit",
                 "save-edit-btn", "setting-restaurant-name", "setting-address",
                 "setting-phone", "setting-gstin", "setting-logo", "setting-tax-mode", "setting-gst-rate", "setting-sgst-rate", "setting-cgst-rate",
                 "setting-discount", "setting-currency", "setting-invoice-prefix",
                 "edit-item-id", "edit-item-name", "edit-item-price", "edit-item-category",
-                "new-item-name", "new-item-price", "new-item-category", "new-item-image",
                 "font-size-slider", "font-size-value"
             ];
             ids.forEach(id => { els[id] = getEl(id); });
@@ -2573,7 +2918,7 @@
                     image: item.image,
                     imageData: item.imageData
                 });
-                saveToStorage(STORAGE_KEYS.CART, cart);
+                saveCart();
                 showNotification(`${item.name} added`, "success");
             }
 
@@ -2600,7 +2945,7 @@
                 selectedItemId = null;
             }
 
-            saveToStorage(STORAGE_KEYS.CART, cart);
+            saveCart();
             updateGlobalController();
             renderMenu();
             renderCart();
@@ -2699,7 +3044,7 @@
         function removeFromCart(id) {
             cart = cart.filter(c => c.id !== id);
             if (selectedItemId === id) selectedItemId = null;
-            saveToStorage(STORAGE_KEYS.CART, cart);
+            saveCart();
             updateGlobalController();
             renderMenu();
             renderCart();
@@ -2711,7 +3056,10 @@
             if (!confirm("Clear all items from cart?")) return;
             cart = [];
             selectedItemId = null;
-            saveToStorage(STORAGE_KEYS.CART, cart);
+            cartDiscount = 0;
+            const discInputEl = document.getElementById('cart-discount-input');
+            if (discInputEl) discInputEl.value = 0;
+            saveCart();
             updateGlobalController();
             renderMenu();
             renderCart();
@@ -2744,6 +3092,7 @@
                     const imgDisplay = item.imageData
                         ? `<img src="${item.imageData}" class="cart-item-image">`
                         : `<div class="cart-item-image">${item.image || "🍽️"}</div>`;
+                    const lineTotal = item.price * item.qty;
 
                     return `
                 <div class="cart-item ${isActive ? "active" : ""}" onclick="selectCartItem(${item.id})">
@@ -2753,21 +3102,23 @@
                         <div class="cart-item-meta">${curr}${item.price.toFixed(2)} x ${item.qty}</div>
                     </div>
                     <div class="cart-item-qty">${item.qty}</div>
-                    <div class="cart-item-total">${curr}${(item.price * item.qty).toFixed(2)}</div>
+                    <div class="cart-item-total">
+                        ${curr}${lineTotal.toFixed(2)}
+                    </div>
                     <button class="remove-btn" onclick="event.stopPropagation(); removeFromCart(${item.id})">🗑</button>
                 </div>
             `;
                 }).join("");
             }
 
-            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            const subtotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
             const taxMode = settings.taxMode || "split";
             const gstRate = taxMode === "gst" ? (settings.gstRate || 0) : 0;
             const sgstRate = taxMode === "split" ? (settings.sgstRate || 0) : 0;
             const cgstRate = taxMode === "split" ? (settings.cgstRate || 0) : 0;
             const totalGstRate = (taxMode === "gst") ? gstRate : (sgstRate + cgstRate);
 
-            const discountRate = settings.discount || 0;
+            const discountRate = cartDiscount;
             const totalGstAmount = (taxMode !== "none") ? (subtotal - (subtotal / (1 + totalGstRate / 100))) : 0;
             const baseAmount = subtotal - totalGstAmount;
 
@@ -2824,6 +3175,52 @@
             }
         }
 
+        function renderCartTotals() {
+            if (cart.length === 0) return;
+            const subtotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+            const taxMode = settings.taxMode || "split";
+            const gstRate = taxMode === "gst" ? (settings.gstRate || 0) : 0;
+            const sgstRate = taxMode === "split" ? (settings.sgstRate || 0) : 0;
+            const cgstRate = taxMode === "split" ? (settings.cgstRate || 0) : 0;
+            const totalGstRate = (taxMode === "gst") ? gstRate : (sgstRate + cgstRate);
+
+            const discountRate = cartDiscount;
+            const totalGstAmount = (taxMode !== "none") ? (subtotal - (subtotal / (1 + totalGstRate / 100))) : 0;
+            const baseAmount = subtotal - totalGstAmount;
+
+            const gstAmount = (taxMode === "gst") ? totalGstAmount : 0;
+            const sgstAmount = (taxMode === "split") ? (baseAmount * (sgstRate / 100)) : 0;
+            const cgstAmount = (taxMode === "split") ? (baseAmount * (cgstRate / 100)) : 0;
+
+            const discountAmount = subtotal * (discountRate / 100);
+            const grandTotal = subtotal - discountAmount;
+            const curr = settings.currency || "₹";
+
+            if (els["subtotal"]) els["subtotal"].textContent = `${curr}${baseAmount.toFixed(2)}`;
+            if (els["sgst-row"]) els["sgst-row"].classList.add("hidden");
+            if (els["cgst-row"]) els["cgst-row"].classList.add("hidden");
+            if (taxMode === "gst" && gstRate > 0) {
+                if (els["gst-row"]) els["gst-row"].classList.remove("hidden");
+                if (els["gst-amount"]) els["gst-amount"].textContent = `${curr}${gstAmount.toFixed(2)}`;
+                if (els["gst-rate"]) els["gst-rate"].textContent = gstRate;
+            } else if (taxMode === "split" && totalGstRate > 0) {
+                if (els["sgst-row"]) els["sgst-row"].classList.remove("hidden");
+                if (els["cgst-row"]) els["cgst-row"].classList.remove("hidden");
+                if (els["sgst-amount"]) els["sgst-amount"].textContent = `${curr}${sgstAmount.toFixed(2)}`;
+                if (els["cgst-amount"]) els["cgst-amount"].textContent = `${curr}${cgstAmount.toFixed(2)}`;
+                if (els["sgst-rate"]) els["sgst-rate"].textContent = sgstRate;
+                if (els["cgst-rate"]) els["cgst-rate"].textContent = cgstRate;
+            }
+            if (els["grand-total"]) els["grand-total"].textContent = `${curr}${grandTotal.toFixed(2)}`;
+            if (els["checkout-count"]) els["checkout-count"].textContent = `${cart.reduce((a, b) => a + b.qty, 0)} items`;
+            if (discountRate > 0) {
+                if (els["discount-row"]) els["discount-row"].classList.remove("hidden");
+                if (els["discount-amount"]) els["discount-amount"].textContent = `-${curr}${discountAmount.toFixed(2)}`;
+            } else {
+                if (els["discount-row"]) els["discount-row"].classList.add("hidden");
+            }
+        }
+
         function generateInvoiceNumber() {
             const count = (orders || []).length + 1;
             return `${settings.invoicePrefix || "INV-"}${String(count).padStart(4, "0")}`;
@@ -2835,14 +3232,14 @@
                 return;
             }
 
-            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            const subtotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
             const taxMode = settings.taxMode || "split";
             const gstRate = taxMode === "gst" ? (settings.gstRate || 0) : 0;
             const sgstRate = taxMode === "split" ? (settings.sgstRate || 0) : 0;
             const cgstRate = taxMode === "split" ? (settings.cgstRate || 0) : 0;
             const totalGstRate = (taxMode === "gst") ? gstRate : (sgstRate + cgstRate);
 
-            const discountRate = settings.discount || 0;
+            const discountRate = cartDiscount;
             const totalGstAmount = (taxMode !== "none") ? (subtotal - (subtotal / (1 + totalGstRate / 100))) : 0;
             const baseAmount = subtotal - totalGstAmount;
 
@@ -2853,6 +3250,7 @@
             const discountAmount = subtotal * (discountRate / 100);
             const grandTotal = subtotal - discountAmount;
             const invoiceNo = generateInvoiceNumber();
+            lastInvoiceNo = invoiceNo;
             const date = new Date();
 
             const order = {
@@ -2868,7 +3266,7 @@
             };
 
             orders.unshift(order);
-            saveToStorage(STORAGE_KEYS.ORDERS, orders);
+            // orders saved to SQLite via save_order API
 
             // ── Auto-save to SQLite database (desktop only) ────────────────
             if (window.pywebview && window.pywebview.api) {
@@ -2952,13 +3350,82 @@
         }
 
         function printReceipt() {
-            window.print();
+            // Build structured receipt data for the Python win32print backend
+            if (!window.pywebview || !window.pywebview.api) {
+                // Fallback for browser preview
+                window.print();
+                return;
+            }
+
+            const subtotal    = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
+            const taxMode     = settings.taxMode || "split";
+            const gstRate     = taxMode === "gst"   ? (settings.gstRate   || 0) : 0;
+            const sgstRate    = taxMode === "split" ? (settings.sgstRate  || 0) : 0;
+            const cgstRate    = taxMode === "split" ? (settings.cgstRate  || 0) : 0;
+            const totalGstRate= taxMode === "gst"   ? gstRate : (sgstRate + cgstRate);
+            const totalGstAmt = taxMode !== "none"
+                ? subtotal - subtotal / (1 + totalGstRate / 100) : 0;
+            const baseAmount  = subtotal - totalGstAmt;
+            const gstAmount   = taxMode === "gst"   ? totalGstAmt : 0;
+            const sgstAmount  = taxMode === "split" ? baseAmount * (sgstRate  / 100) : 0;
+            const cgstAmount  = taxMode === "split" ? baseAmount * (cgstRate  / 100) : 0;
+            const discountRate   = cartDiscount;
+            const discountAmount = subtotal * (discountRate / 100);
+            const grandTotal  = subtotal - discountAmount;
+
+            const date    = new Date();
+            const dateStr = date.toLocaleString("en-IN", {
+                day: "2-digit", month: "short", year: "numeric",
+                hour: "2-digit", minute: "2-digit", hour12: true
+            });
+
+            const receipt = {
+                restaurantName: settings.restaurantName || "MY RESTAURANT",
+                address:        settings.address  || "",
+                phone:          settings.phone    || "",
+                gstin:          settings.gstin    || "",
+                invoiceNo:      (lastInvoiceNo || generateInvoiceNumber()),
+                dateStr,
+                currency:       settings.currency || "Rs.",
+                items: cart.map(i => ({
+                    name:  i.name,
+                    qty:   i.qty,
+                    price: i.price,
+                    total: i.price * i.qty
+                })),
+                baseAmount, taxMode, gstRate, sgstRate, cgstRate,
+                gstAmount, sgstAmount, cgstAmount,
+                discountRate, discountAmount, grandTotal
+            };
+
+            const btn = document.getElementById("print-receipt-btn");
+            if (btn) { btn.disabled = true; btn.textContent = "🖨️ Printing…"; }
+
+            window.pywebview.api.print_receipt(receipt)
+                .then(result => {
+                    if (result.ok) {
+                        showNotification("Receipt sent to printer!", "success");
+                    } else {
+                        showNotification("Print error: " + result.error, "error");
+                        console.error("Print error:", result.error);
+                    }
+                })
+                .catch(e => {
+                    showNotification("Print failed: " + e, "error");
+                    console.error("Print API error:", e);
+                })
+                .finally(() => {
+                    if (btn) { btn.disabled = false; btn.textContent = "🖨️ Print"; }
+                });
         }
 
         function newOrder() {
             cart = [];
             selectedItemId = null;
-            saveToStorage(STORAGE_KEYS.CART, cart);
+            cartDiscount = 0;
+            const discInputEl = document.getElementById('cart-discount-input');
+            if (discInputEl) discInputEl.value = 0;
+            saveCart();
             updateGlobalController();
             renderMenu();
             renderCart();
@@ -3045,7 +3512,7 @@
             settings = JSON.parse(JSON.stringify(defaultSettings));
             menu = JSON.parse(JSON.stringify(defaultMenu));
             saveToConfig(settings);
-            saveToStorage(STORAGE_KEYS.MENU, menu);
+            saveMenu();
             applySettings();
             renderMenu();
             renderCart();
@@ -3116,25 +3583,81 @@
 
             const curr = settings.currency || "₹";
 
-            listEl.innerHTML = menu.map(item => {
-                const imgDisplay = item.imageData
-                    ? `<img src="${item.imageData}" alt="">`
-                    : `<div style="width:34px;height:34px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:1rem;background:var(--bg-tertiary)">${item.image || "🍽️"}</div>`;
+            if (menu.length === 0) {
+                listEl.innerHTML = `<div style="color:var(--text-secondary);padding:1rem;text-align:center;">No menu items yet.</div>`;
+                return;
+            }
 
-                return `
-            <div class="menu-list-item">
-                ${imgDisplay}
-                <div class="item-info">
-                    <div class="item-name">${item.name}</div>
-                    <div class="item-meta">${getCategoryName(item.category)} • ${curr}${item.price.toFixed(2)}</div>
-                </div>
-                <div class="item-actions">
-                    <button class="edit-btn" onclick="openEditItem(${item.id})">✏️</button>
-                    <button class="delete-btn" onclick="deleteMenuItem(${item.id})">🗑</button>
-                </div>
-            </div>
-        `;
-            }).join("");
+            // Group items by category
+            const grouped = {};
+            categories.forEach(cat => { grouped[cat.id] = []; });
+            menu.forEach(item => {
+                if (!grouped[item.category]) grouped[item.category] = [];
+                grouped[item.category].push(item);
+            });
+
+            let html = "";
+            categories.forEach(cat => {
+                const items = grouped[cat.id] || [];
+                if (items.length === 0) return;
+                html += `
+                <div style="margin-bottom:1rem;">
+                    <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--bg-tertiary);border-radius:8px;margin-bottom:6px;border-left:3px solid var(--accent);">
+                        <span style="font-size:1.1rem;">${cat.icon}</span>
+                        <span style="font-weight:700;font-size:0.95rem;color:var(--text-primary);">${cat.name}</span>
+                        <span style="margin-left:auto;font-size:0.78rem;color:var(--text-secondary);background:var(--bg-secondary);border-radius:12px;padding:1px 8px;">${items.length} item${items.length !== 1 ? "s" : ""}</span>
+                    </div>
+                    ${items.map(item => {
+                        const imgDisplay = item.imageData
+                            ? `<img src="${item.imageData}" alt="">`
+                            : `<div style="width:34px;height:34px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:1rem;background:var(--bg-tertiary)">${item.image || "🍽️"}</div>`;
+                        return `
+                        <div class="menu-list-item" style="margin-left:10px;">
+                            ${imgDisplay}
+                            <div class="item-info">
+                                <div class="item-name">${item.name}</div>
+                                <div class="item-meta">${curr}${item.price.toFixed(2)}</div>
+                            </div>
+                            <div class="item-actions">
+                                <button class="edit-btn" onclick="openEditItem(${item.id})">✏️</button>
+                                <button class="delete-btn" onclick="deleteMenuItem(${item.id})">🗑</button>
+                            </div>
+                        </div>`;
+                    }).join("")}
+                </div>`;
+            });
+
+            // Uncategorized items (category not in categories list)
+            const uncategorized = menu.filter(item => !categories.find(c => c.id === item.category));
+            if (uncategorized.length > 0) {
+                html += `
+                <div style="margin-bottom:1rem;">
+                    <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--bg-tertiary);border-radius:8px;margin-bottom:6px;border-left:3px solid #e67e22;">
+                        <span style="font-size:1.1rem;">❓</span>
+                        <span style="font-weight:700;font-size:0.95rem;color:var(--text-primary);">Uncategorized</span>
+                        <span style="margin-left:auto;font-size:0.78rem;color:var(--text-secondary);background:var(--bg-secondary);border-radius:12px;padding:1px 8px;">${uncategorized.length} item${uncategorized.length !== 1 ? "s" : ""}</span>
+                    </div>
+                    ${uncategorized.map(item => {
+                        const imgDisplay = item.imageData
+                            ? `<img src="${item.imageData}" alt="">`
+                            : `<div style="width:34px;height:34px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:1rem;background:var(--bg-tertiary)">${item.image || "🍽️"}</div>`;
+                        return `
+                        <div class="menu-list-item" style="margin-left:10px;">
+                            ${imgDisplay}
+                            <div class="item-info">
+                                <div class="item-name">${item.name}</div>
+                                <div class="item-meta">${curr}${item.price.toFixed(2)}</div>
+                            </div>
+                            <div class="item-actions">
+                                <button class="edit-btn" onclick="openEditItem(${item.id})">✏️</button>
+                                <button class="delete-btn" onclick="deleteMenuItem(${item.id})">🗑</button>
+                            </div>
+                        </div>`;
+                    }).join("")}
+                </div>`;
+            }
+
+            listEl.innerHTML = html;
         }
 
         function addMenuItem() {
@@ -3160,7 +3683,7 @@
                 reader.onload = (e) => {
                     newItem.imageData = e.target.result;
                     menu.push(newItem);
-                    saveToStorage(STORAGE_KEYS.MENU, menu);
+                    saveMenu();
                     renderMenu();
                     renderSettingsMenuList();
                     if (nameEl) nameEl.value = "";
@@ -3171,7 +3694,7 @@
                 reader.readAsDataURL(fileInput.files[0]);
             } else {
                 menu.push(newItem);
-                saveToStorage(STORAGE_KEYS.MENU, menu);
+                saveMenu();
                 renderMenu();
                 renderSettingsMenuList();
                 if (nameEl) nameEl.value = "";
@@ -3227,12 +3750,15 @@
         }
 
         function finalizeEdit() {
-            saveToStorage(STORAGE_KEYS.MENU, menu);
+            saveMenu();
             renderMenu();
             renderSettingsMenuList();
             renderCart();
             closeModal("edit-item-modal");
             showNotification("Item updated", "success");
+            // Refresh MM page if it's open
+            const mmPage = document.getElementById("menu-manager-page");
+            if (mmPage && mmPage.classList.contains("active")) refreshMMPage();
         }
 
         function deleteMenuItem(id) {
@@ -3240,8 +3766,8 @@
             menu = menu.filter(m => m.id !== id);
             cart = cart.filter(c => c.id !== id);
             if (selectedItemId === id) selectedItemId = null;
-            saveToStorage(STORAGE_KEYS.MENU, menu);
-            saveToStorage(STORAGE_KEYS.CART, cart);
+            saveMenu();
+            saveCart();
             updateGlobalController();
             renderMenu();
             renderCart();
@@ -3941,6 +4467,213 @@
             setTimeout(() => {
                 if (!window.pywebview) init();
             }, 500);
+        }
+
+        // ── Menu Manager Page ────────────────────────────────────────────────
+        function switchView(view) {
+            const posContainer = document.querySelector(".main-container");
+            const mmPage = document.getElementById("menu-manager-page");
+            const posBtn = document.getElementById("pos-view-btn");
+            const menuBtn = document.getElementById("menu-view-btn");
+
+            if (view === "menu-manager") {
+                posContainer.style.display = "none";
+                mmPage.classList.add("active");
+                posBtn.classList.remove("active");
+                menuBtn.classList.add("active");
+                refreshMMPage();
+            } else {
+                posContainer.style.display = "";
+                mmPage.classList.remove("active");
+                posBtn.classList.add("active");
+                menuBtn.classList.remove("active");
+            }
+        }
+
+        function refreshMMPage() {
+            const curr = (settings && settings.currency) ? settings.currency : "₹";
+            // Stats
+            const totalItems = menu.length;
+            const totalCats = categories.length;
+            const avgPrice = totalItems > 0 ? (menu.reduce((s, i) => s + i.price, 0) / totalItems) : 0;
+            const maxPrice = totalItems > 0 ? Math.max(...menu.map(i => i.price)) : 0;
+
+            const setStat = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+            setStat("mm-stat-items", totalItems);
+            setStat("mm-stat-cats", totalCats);
+            setStat("mm-stat-avgprice", curr + avgPrice.toFixed(0));
+            setStat("mm-stat-highest", curr + maxPrice.toFixed(0));
+
+            // Badges
+            const catBadge = document.getElementById("mm-cat-count-badge");
+            if (catBadge) catBadge.textContent = totalCats;
+            const itemsBadge = document.getElementById("mm-items-count-badge");
+            if (itemsBadge) itemsBadge.textContent = totalItems;
+
+            // Populate category selects
+            const catSel = document.getElementById("mm-new-item-category");
+            const filterSel = document.getElementById("mm-filter-cat");
+            if (catSel) {
+                catSel.innerHTML = categories.map(c => `<option value="${c.id}">${c.icon} ${c.name}</option>`).join("");
+            }
+            if (filterSel) {
+                filterSel.innerHTML = `<option value="all">All Categories</option>` +
+                    categories.map(c => `<option value="${c.id}">${c.icon} ${c.name}</option>`).join("");
+            }
+
+            renderMMCategoryChips();
+            renderMMItemsGrid();
+        }
+
+        function renderMMCategoryChips() {
+            const el = document.getElementById("mm-category-chips");
+            if (!el) return;
+            if (categories.length === 0) {
+                el.innerHTML = `<span style="color:var(--text-secondary);font-size:0.82rem;">No categories yet.</span>`;
+                return;
+            }
+            el.innerHTML = categories.map(cat => {
+                const count = menu.filter(m => m.category === cat.id).length;
+                return `<div class="mm-cat-chip">
+                    <span>${cat.icon}</span>
+                    <span>${cat.name}</span>
+                    <span style="font-size:0.75rem;color:var(--text-secondary);background:var(--bg-secondary);border-radius:10px;padding:1px 7px;">${count}</span>
+                    <span class="del-cat" onclick="mmDeleteCategory('${cat.id}')" title="Delete">✕</span>
+                </div>`;
+            }).join("");
+        }
+
+        function renderMMItemsGrid() {
+            const el = document.getElementById("mm-items-grid");
+            if (!el) return;
+            const curr = (settings && settings.currency) ? settings.currency : "₹";
+            const search = (document.getElementById("mm-search") || {value: ""}).value.toLowerCase();
+            const filterCat = (document.getElementById("mm-filter-cat") || {value: "all"}).value;
+            const sortMode = (document.getElementById("mm-sort") || {value: "name"}).value;
+
+            let filtered = menu.filter(item => {
+                const matchSearch = !search || item.name.toLowerCase().includes(search);
+                const matchCat = filterCat === "all" || item.category === filterCat;
+                return matchSearch && matchCat;
+            });
+
+            if (sortMode === "name") filtered.sort((a, b) => a.name.localeCompare(b.name));
+            else if (sortMode === "name-desc") filtered.sort((a, b) => b.name.localeCompare(a.name));
+            else if (sortMode === "price-asc") filtered.sort((a, b) => a.price - b.price);
+            else if (sortMode === "price-desc") filtered.sort((a, b) => b.price - a.price);
+            else if (sortMode === "cat") filtered.sort((a, b) => a.category.localeCompare(b.category));
+
+            if (filtered.length === 0) {
+                el.innerHTML = `<div style="color:var(--text-secondary);padding:2rem;text-align:center;grid-column:1/-1;">No items found.</div>`;
+                return;
+            }
+
+            el.innerHTML = filtered.map(item => {
+                const cat = categories.find(c => c.id === item.category);
+                const catLabel = cat ? `${cat.icon} ${cat.name}` : "Uncategorized";
+                const thumb = item.imageData
+                    ? `<div class="mm-item-thumb"><img src="${item.imageData}" alt=""></div>`
+                    : `<div class="mm-item-thumb">${item.image || "🍽️"}</div>`;
+                return `<div class="mm-item-card">
+                    ${thumb}
+                    <div class="mm-item-info">
+                        <div class="name">${item.name}</div>
+                        <div class="price">${curr}${item.price.toFixed(2)}</div>
+                        <div style="font-size:0.72rem;color:var(--text-secondary);margin-top:2px;">${catLabel}</div>
+                    </div>
+                    <div class="mm-item-actions">
+                        <button onclick="openEditItem(${item.id})" title="Edit">✏️</button>
+                        <button class="del" onclick="mmDeleteMenuItem(${item.id})" title="Delete">🗑</button>
+                    </div>
+                </div>`;
+            }).join("");
+        }
+
+        function mmAddMenuItem() {
+            const nameEl = document.getElementById("mm-new-item-name");
+            const priceEl = document.getElementById("mm-new-item-price");
+            const categoryEl = document.getElementById("mm-new-item-category");
+            const fileInput = document.getElementById("mm-new-item-image");
+
+            const name = nameEl ? nameEl.value.trim() : "";
+            const price = priceEl ? parseFloat(priceEl.value) : 0;
+            const category = categoryEl ? categoryEl.value : (categories[0] ? categories[0].id : "");
+
+            if (!name || !price || price <= 0) {
+                showNotification("Please enter a valid name and price", "error");
+                return;
+            }
+
+            const newId = Math.max(...menu.map(m => m.id), 0) + 1;
+            const newItem = { id: newId, name, price, category, image: "🍽️" };
+
+            const finishAdd = () => {
+                menu.push(newItem);
+                saveMenu();
+                renderMenu();
+                renderSettingsMenuList();
+                if (nameEl) nameEl.value = "";
+                if (priceEl) priceEl.value = "";
+                if (fileInput) fileInput.value = "";
+                showNotification("Item added: " + name, "success");
+                refreshMMPage();
+            };
+
+            if (fileInput && fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (e) => { newItem.imageData = e.target.result; finishAdd(); };
+                reader.readAsDataURL(fileInput.files[0]);
+            } else {
+                finishAdd();
+            }
+        }
+
+        function mmAddCategory() {
+            const nameEl = document.getElementById("mm-new-category-name");
+            const iconEl = document.getElementById("mm-new-category-icon");
+            const name = nameEl ? nameEl.value.trim() : "";
+            const icon = (iconEl ? iconEl.value.trim() : "") || "🍽️";
+            if (!name) { showNotification("Category name required", "error"); return; }
+            const id = name.toLowerCase().replace(/\s+/g, "-") + "-" + Date.now();
+            categories.push({ id, name, icon });
+            db.saveCategories(categories);
+            if (nameEl) nameEl.value = "";
+            if (iconEl) iconEl.value = "";
+            renderCategorySidebar();
+            populateCategoryDropdowns();
+            showNotification("Category added: " + name, "success");
+            refreshMMPage();
+        }
+
+        function mmDeleteCategory(id) {
+            const cat = categories.find(c => c.id === id);
+            const itemCount = menu.filter(m => m.category === id).length;
+            const msg = itemCount > 0
+                ? `Delete category "${cat ? cat.name : id}"? ${itemCount} item(s) will become uncategorized.`
+                : `Delete category "${cat ? cat.name : id}"?`;
+            if (!confirm(msg)) return;
+            categories = categories.filter(c => c.id !== id);
+            db.saveCategories(categories);
+            renderCategorySidebar();
+            populateCategoryDropdowns();
+            showNotification("Category deleted", "info");
+            refreshMMPage();
+        }
+
+        function mmDeleteMenuItem(id) {
+            const item = menu.find(m => m.id === id);
+            if (!confirm(`Delete "${item ? item.name : "item"}" permanently?`)) return;
+            menu = menu.filter(m => m.id !== id);
+            cart = cart.filter(c => c.id !== id);
+            if (selectedItemId === id) selectedItemId = null;
+            saveMenu();
+            saveCart();
+            updateGlobalController();
+            renderMenu();
+            renderCart();
+            renderSettingsMenuList();
+            showNotification("Item deleted", "info");
+            refreshMMPage();
         }
     </script>
 </body>

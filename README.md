@@ -9,6 +9,59 @@ open terminal
 Run git clone https://github.com/krisclive2026/HBillSoft-Touchscreen.git
 
 
+Copy and paste HBillSoft.exe in your Desktop
+
+
+Double click to open
+
+
+On first launch , It will ask for activation key
+
+
+copy the system code 
+
+
+Run HBillSoftKeygenerator.exe
+
+paste the system code 
+
+
+select the expiry date 
+
+
+
+
+click on create activation key
+
+
+
+
+
+copy the created key 
+
+
+
+
+paste it in the HBillSoft app
+
+
+
+
+
+the app will open
+
+
+
+
+
+
+
+
+
+
+if you want to run the source code 
+
+
 
 Run main.py
 
